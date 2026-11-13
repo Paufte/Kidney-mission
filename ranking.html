@@ -18,6 +18,7 @@ h1 span{background:linear-gradient(90deg,var(--tq),var(--blue));-webkit-backgrou
 .live{width:10px;height:10px;border-radius:50%;background:#ff4d6a;box-shadow:0 0 0 0 rgba(255,77,106,.6);animation:live 1.6s infinite}
 @keyframes live{70%{box-shadow:0 0 0 12px rgba(255,77,106,0)}100%{box-shadow:0 0 0 0 rgba(255,77,106,0)}}
 .head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:clamp(14px,2vw,28px)}
+.ctrls{display:flex;gap:10px;flex-wrap:wrap}
 .tabs{display:flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:12px;background:rgba(11,23,54,.8)}
 .tabs button{font:600 15px var(--fd);letter-spacing:.08em;color:var(--mut);background:none;border:0;padding:8px 16px;border-radius:9px;cursor:pointer}
 .tabs button.on{background:linear-gradient(100deg,var(--tq),var(--blue));color:#03122a}
@@ -48,9 +49,9 @@ border-radius:16px;border:1px solid var(--line);background:rgba(11,23,54,.82);fo
 </style></head>
 <body><div class="wrap">
 <main>
- <div class="head"><div><div class="eb"><i class="live"></i>RANKING EN DIRECTO</div><h1>KIDNEY <span>MISSION</span></h1></div>
- <div class="tabs" role="tablist"><button id="tHoy" class="on">HOY</button><button id="tAll">TOTAL</button></div></div>
- <div class="list" id="list"><div class="empty">Cargando ranking…</div></div>
+ <div class="head"><div><div class="eb"><i class="live"></i><span data-t="live">RANKING EN DIRECTO</span></div><h1>KIDNEY <span>MISSION</span></h1></div>
+ <div class="ctrls"><div class="tabs" role="tablist"><button id="tHoy" class="on" data-t="hoy">HOY</button><button id="tAll" data-t="total">TOTAL</button></div><div class="tabs"><button data-l="es">ES</button><button data-l="ca">CA</button></div></div></div>
+ <div class="list" id="list"><div class="empty" data-t="loading">Cargando ranking…</div></div>
 </main>
 <aside class="side">
  <div class="card"><svg viewBox="-0.5 -0.5 38 38" width="100%" height="100%"><defs>
@@ -62,9 +63,9 @@ border-radius:16px;border:1px solid var(--line);background:rgba(11,23,54,.82);fo
   <rect x="2" y="32" width="3" height="3" rx=".9" fill="url(#g2)"/>
 <rect x="14.2" y="14.2" width="8.6" height="8.6" rx="2" fill="#fff"/><g transform="translate(14.6,14.4) scale(0.065)"><path d="M66 8C30 6 10 36 12 72s24 62 54 60c26-2 34-24 22-40-8-10-8-26 0-36C102 38 98 10 66 8z" fill="#062033" stroke="url(#g)" stroke-width="7"/>
 <path d="M4 74h26l6-14 9 30 8-24 6 8h57" fill="none" stroke="#22e4c8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
- <div class="cta">ESCANEA Y JUEGA</div>
- <div class="stat"><div><small>Partidas</small><b id="cnt">–</b></div><div><small>Récord</small><b id="rec">–</b></div></div>
- <p class="foot">Se actualiza cada 5 segundos. Juego divulgativo sobre donación y trasplante renal. Casos ficticios.</p>
+ <div class="cta" data-t="cta">ESCANEA Y JUEGA</div>
+ <div class="stat"><div><small data-t="games">Partidas</small><b id="cnt">–</b></div><div><small data-t="record">Récord</small><b id="rec">–</b></div></div>
+ <p class="foot" data-t="foot">Se actualiza cada 5 segundos. Juego divulgativo sobre donación y trasplante renal. Casos ficticios.</p>
  <p class="foot err" id="err"></p>
 </aside>
 </div>
@@ -73,13 +74,20 @@ border-radius:16px;border:1px solid var(--line);background:rgba(11,23,54,.82);fo
 const CFG=window.KM_CFG||{};
 const H={apikey:CFG.key};if(/^eyJ/.test(CFG.key||''))H.Authorization='Bearer '+CFG.key;
 let mode='hoy',seen=null;
+const TX={es:{live:'RANKING EN DIRECTO',hoy:'HOY',total:'TOTAL',loading:'Cargando ranking…',cta:'ESCANEA Y JUEGA',games:'Partidas',record:'Récord',foot:'Se actualiza cada 5 segundos. Juego divulgativo sobre donación y trasplante renal. Casos ficticios.',noconf:'Falta configurar Supabase en config.js.',notconf:'Ranking no configurado.',emptyToday:'Todavía no hay partidas hoy. ¡Escanea el QR y estrena el ranking!',empty:'Todavía no hay partidas.',offline:'Sin conexión con el ranking. Reintentando…',title:'Kidney Mission · Ranking en directo'},
+ ca:{live:'RÀNQUING EN DIRECTE',hoy:'AVUI',total:'TOTAL',loading:'Carregant el rànquing…',cta:'ESCANEJA I JUGA',games:'Partides',record:'Rècord',foot:'S\'actualitza cada 5 segons. Joc divulgatiu sobre donació i trasplantament renal. Casos ficticis.',noconf:'Falta configurar Supabase a config.js.',notconf:'Rànquing no configurat.',emptyToday:'Encara no hi ha partides avui. Escaneja el QR i estrena el rànquing!',empty:'Encara no hi ha partides.',offline:'Sense connexió amb el rànquing. Reintentant…',title:'Kidney Mission · Rànquing en directe'}};
+let LANG='es';try{const q=(location.hash||'').slice(1);LANG=q==='ca'||q==='es'?q:(localStorage.getItem('km_lang')||((navigator.language||'').toLowerCase().startsWith('ca')?'ca':'es'));}catch(e){}
+const t=k=>TX[LANG][k];
+function applyLang(){document.documentElement.lang=LANG;document.title=t('title');document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));document.querySelectorAll('[data-l]').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));}
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('km_lang',LANG);}catch(e){}applyLang();seen=null;load();});
+applyLang();
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const since=()=>{const d=new Date();d.setHours(0,0,0,0);return d.toISOString();};
 const filt=()=>mode==='hoy'?`&created_at=gte.${encodeURIComponent(since())}`:'';
 const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 async function load(){
   const e=document.getElementById('err');
-  if(!CFG.url||!CFG.key){e.textContent='Falta configurar Supabase en config.js.';document.getElementById('list').innerHTML='<div class="empty">Ranking no configurado.</div>';return;}
+  if(!CFG.url||!CFG.key){e.textContent=t('noconf');document.getElementById('list').innerHTML=`<div class="empty">${t('notconf')}</div>`;return;}
   try{
     const [r,c]=await Promise.all([
       fetch(`${CFG.url}/rest/v1/scores?select=id,alias,score,pct,secs,created_at&order=score.desc,secs.asc,created_at.asc&limit=10${filt()}`,{headers:H}),
@@ -91,9 +99,9 @@ async function load(){
     document.getElementById('rec').textContent=l[0]?l[0].score:'–';
     const ids=new Set(l.map(x=>x.id));
     document.getElementById('list').innerHTML=l.length?l.map((x,i)=>`<div class="r ${i<3?'g'+(i+1):''} ${seen&&!seen.has(x.id)?'new':''}"><span class="p">${i+1}</span><span class="n">${esc(x.alias)}</span><span class="a">${x.pct}% · ${mmss(x.secs)}</span><span class="s">${x.score}</span></div>`).join(''):
-      `<div class="empty">${mode==='hoy'?'Todavía no hay partidas hoy. ¡Escanea el QR y estrena el ranking!':'Todavía no hay partidas.'}</div>`;
+      `<div class="empty">${mode==='hoy'?t('emptyToday'):t('empty')}</div>`;
     seen=ids;e.textContent='';
-  }catch(x){e.textContent='Sin conexión con el ranking. Reintentando…';}
+  }catch(x){e.textContent=t('offline');}
 }
 function setMode(m){mode=m;seen=null;document.getElementById('tHoy').classList.toggle('on',m==='hoy');document.getElementById('tAll').classList.toggle('on',m!=='hoy');load();}
 document.getElementById('tHoy').onclick=()=>setMode('hoy');

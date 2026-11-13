@@ -279,6 +279,9 @@ p{margin:0}
 .big{font-size:20px;line-height:1.4;font-family:var(--f-disp);font-weight:600}
 a{color:var(--tq)}
 .src{font-size:12.5px;color:var(--mut)}
+.lang{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:rgba(11,23,54,.85)}
+.lang button{border:0;background:none;color:var(--mut);font-family:var(--f-disp);font-weight:600;font-size:15px;letter-spacing:.06em;padding:9px 18px;border-radius:9px;min-height:40px}
+.lang button.on{background:linear-gradient(100deg,var(--tq),var(--blue));color:#03122a}
 .lb{display:flex;flex-direction:column;gap:10px}
 .lbform{display:flex;gap:8px}
 .lbform input{flex:1;min-width:0;height:52px;border-radius:12px;border:1px solid var(--line);background:rgba(4,10,28,.8);color:var(--txt);font:inherit;font-size:17px;padding:0 14px}
@@ -329,7 +332,7 @@ const ic=(n,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const AP='<span class="approx">DATO ORIENTATIVO</span>';
 
 /* ============ GLOSARIO ============ */
-const G={
+const G_ES={
   erc:['Enfermedad renal crónica','Pérdida progresiva y permanente de la función de los riñones. En fase avanzada se necesita diálisis o trasplante para vivir.'],
   dial:['Diálisis','Tratamiento que sustituye parte del trabajo de los riñones: limpia la sangre con una máquina (hemodiálisis) o a través de la membrana del abdomen (diálisis peritoneal).'],
   uci:['UCI','Unidad de Cuidados Intensivos: la zona del hospital donde se atiende a pacientes en estado crítico.'],
@@ -349,7 +352,7 @@ const G={
 const fmt=s=>s.replace(/\{\{(\w+)\|([^}]+)\}\}/g,'<button class="term" data-g="$1">$2</button>');
 
 /* ============ CONTENIDO ============ */
-const MISSIONS=[
+const MISSIONS_ES=[
 {code:'THE DONOR',title:'El donante',tag:'El inicio de todo',icon:'heart',
  learn:[
   {icon:'heart',h:'¿Qué es donar un órgano?',p:'Es regalar un órgano para que siga funcionando en el cuerpo de otra persona. En España la donación es <b>altruista, anónima y gratuita</b>: nadie puede cobrar ni pagar por un órgano.'},
@@ -506,6 +509,269 @@ const MISSIONS=[
  ]}
 ];
 
+/* ============ CONTINGUT EN CATALÀ ============ */
+const AP_CA='<span class="approx">DADA ORIENTATIVA</span>';
+const G_CA={
+  erc:['Malaltia renal crònica','Pèrdua progressiva i permanent de la funció dels ronyons. En fase avançada cal diàlisi o trasplantament per viure.'],
+  dial:['Diàlisi','Tractament que substitueix part de la feina dels ronyons: neteja la sang amb una màquina (hemodiàlisi) o a través de la membrana de l\'abdomen (diàlisi peritoneal).'],
+  uci:['UCI','Unitat de Cures Intensives: la zona de l\'hospital on s\'atén pacients en estat crític.'],
+  me:['Mort encefàlica','Cessament irreversible de totes les funcions del cervell, inclòs el tronc cerebral. Mèdicament i legalment és la mort de la persona. No és un coma: en el coma el cervell continua funcionant.'],
+  ont:['ONT i OCATT','L\'Organització Nacional de Trasplantaments (ONT) coordina la donació i el trasplantament d\'òrgans a Espanya. A Catalunya hi treballa conjuntament l\'Organització Catalana de Trasplantaments (OCATT).'],
+  hla:['HLA','Antígens leucocitaris humans. Proteïnes de la superfície de les cèl·lules que funcionen com un carnet d\'identitat per al sistema immunitari. S\'hereten dels pares.'],
+  ac:['Anticossos','Proteïnes de defensa que fabrica el sistema immunitari per reconèixer i atacar allò que considera estrany.'],
+  pc:['Prova creuada (crossmatch)','Anàlisi que enfronta la sang del receptor amb cèl·lules del donant per comprovar si el receptor té anticossos contra aquell donant concret.'],
+  hiper:['Pacient hiperimmunitzat','Persona amb molts anticossos contra HLA, per transfusions, embarassos o trasplantaments previs. Li és molt més difícil trobar un donant compatible.'],
+  isq:['Isquèmia freda','Temps que l\'òrgan passa refredat i sense reg sanguini, des que es conserva en fred fins que es connecta a la circulació del receptor.'],
+  si:['Sistema immunitari','Conjunt de cèl·lules i òrgans que defensen el cos de les infeccions i de tot allò que reconeix com a estrany.'],
+  fi:['Fossa ilíaca','Zona de la part baixa de l\'abdomen, a cada costat, a prop de l\'os del maluc.'],
+  ur:['Urèter','Tub prim que porta l\'orina des del ronyó fins a la bufeta.'],
+  inj:['Empelt','L\'òrgan trasplantat. Aquí, el ronyó nou.'],
+  inm:['Immunosupressors','Medicaments que redueixen l\'activitat del sistema immunitari per evitar que ataqui l\'òrgan trasplantat.']
+};
+const MISSIONS_CA=[
+{code:'THE DONOR',title:'El donant',tag:'L\'inici de tot',icon:'heart',
+ learn:[
+  {icon:'heart',h:'Què és donar un òrgan?',p:'És regalar un òrgan perquè continuï funcionant dins del cos d\'una altra persona. A Espanya la donació és <b>altruista, anònima i gratuïta</b>: ningú pot cobrar ni pagar per un òrgan.'},
+  {icon:'users',h:'Dos tipus de donant',list:[
+    '<b>Donant viu.</b> Una persona sana dona un dels seus dos ronyons, normalment a un familiar o algú proper. Abans passa una avaluació mèdica i psicològica molt completa.',
+    '<b>Donant mort.</b> Després del diagnòstic de la mort a la {{uci|UCI}} d\'un hospital, si no hi ha contraindicacions mèdiques i es respecta la seva voluntat.']},
+  {icon:'shield',h:'La coordinació de trasplantaments',p:'Metges i infermeres de l\'hospital que detecten possibles donants, acompanyen la família, comproven que tot compleix la llei i organitzen el procés. Tot es coordina amb l\'{{ont|ONT i l\'OCATT}}.'}
+ ],
+ steps:[
+  {t:'choice',ctx:'<span class="ficticio">ESCENARI FICTICI</span><br><b>UCI · 03:20.</b> Un home de 48 anys ingressa amb una hemorràgia cerebral molt greu. Encara no se n\'ha diagnosticat la mort.',
+   q:'Què fa ara l\'equip mèdic?',
+   o:[{x:'Continuar tractant-lo per intentar salvar-li la vida',ok:1},
+      {x:'Començar a preparar l\'extracció dels seus òrgans',fb:'Mentre hi hagi possibilitat de salvar-lo, tot l\'esforç s\'hi dedica.'},
+      {x:'Buscar ja un receptor per als seus ronyons',fb:'Ningú busca receptors per a algú que està sent tractat.'}],
+   exp:'La prioritat absoluta és sempre el pacient. La possibilitat de donació només es planteja en determinades circumstàncies, i mai no canvia l\'esforç per salvar-lo.'},
+  {t:'choice',ctx:'Malgrat tots els tractaments, el cervell ha deixat de funcionar del tot.',
+   q:'Qui diagnostica la {{me|mort encefàlica}}?',
+   o:[{x:'Metges que no formen part de l\'equip de trasplantament, amb proves que marca la llei',ok:1},
+      {x:'L\'equip que farà el trasplantament',fb:'Si fos així hi hauria un conflicte d\'interessos. La llei ho prohibeix expressament.'},
+      {x:'La família, quan ho decideix',fb:'La mort és un diagnòstic mèdic amb criteris i proves establerts.'}],
+   exp:'A Espanya la llei exigeix que el diagnòstic el facin metges aliens a l\'extracció i al trasplantament. La mort encefàlica és el cessament irreversible de totes les funcions del cervell: és la mort de la persona i <b>no és un coma</b>.'},
+  {t:'choice',q:'Ja s\'ha certificat la mort. Quin és el pas següent?',
+   o:[{x:'Esbrinar si va expressar la seva voluntat i parlar amb la família, amb respecte i suport',ok:1},
+      {x:'Extreure els òrgans sense parlar amb ningú: la llei diu que tots som donants',fb:'La llei espanyola considera donant qui no s\'hi va oposar en vida, però a la pràctica sempre es parla amb la família per conèixer i respectar la voluntat de la persona.'},
+      {x:'Només es pot donar si duia a sobre el carnet de donant',fb:'El carnet no és imprescindible. El més important és que la teva família conegui el teu desig, perquè serà qui el transmetrà.'}],
+   exp:'Respectar la voluntat del donant és un pilar del sistema. L\'entrevista amb la família la fan professionals formats, i la decisió es respecta sigui quina sigui.'},
+  {t:'choice',q:'La família confirma que ell volia donar. Què es valora abans d\'acceptar la donació?',
+   o:[{x:'La seva història clínica i proves per descartar malalties transmissibles i veure com funcionen els seus òrgans',ok:1},
+      {x:'Només l\'edat: a partir de certa edat no es pot donar',fb:'No hi ha una edat límit fixa. Cada cas es valora de manera individual.'},
+      {x:'Res: qualsevol òrgan serveix',fb:'Cal protegir el receptor. S\'estudia cada òrgan abans d\'acceptar-lo.'}],
+   exp:'Es revisen antecedents, anàlisis i proves d\'imatge per protegir el receptor i saber si cada òrgan és vàlid.'},
+  {t:'tf',items:[
+   {s:'Una persona sana pot donar un ronyó en vida a un familiar.',a:1,exp:'Sí. Es pot fer una vida normal amb un sol ronyó, després d\'una avaluació mèdica i psicològica completa. A Espanya el consentiment del donant viu es ratifica davant d\'un jutge per assegurar que és lliure.'},
+   {s:'Es pot cobrar per donar un ronyó si totes dues parts hi estan d\'acord.',a:0,exp:'Fals. El comerç d\'òrgans és il·legal a Espanya i a la gran majoria de països. La donació és sempre altruista.'},
+   {s:'La família del donant mort i el receptor es poden conèixer a l\'hospital.',a:0,exp:'Fals. A Espanya la donació de persones mortes és anònima: ni la família del donant ni el receptor coneixen la identitat de l\'altre.'}]}
+ ]},
+{code:'FIND THE MATCH',title:'El receptor',tag:'Trobar el receptor adequat',icon:'dna',
+ learn:[
+  {icon:'users',h:'La llista d\'espera',p:'La formen persones amb {{erc|malaltia renal crònica}} avançada. Mentre esperen, moltes depenen de la {{dial|diàlisi}}: amb hemodiàlisi solen ser 3 sessions per setmana d\'unes 4 hores. El ronyó és l\'òrgan que més es trasplanta.'},
+  {icon:'drop',h:'Grup sanguini (ABO)',p:'Igual que en una transfusió, el grup del donant ha de ser compatible amb el del receptor. Si no ho és, el {{si|sistema immunitari}} atacaria el ronyó gairebé immediatament.'},
+  {icon:'dna',h:'HLA: la teva empremta immunitària',p:'Els {{hla|HLA}} són proteïnes de les teves cèl·lules heretades dels pares. Com més s\'assemblen les del donant i les del receptor, millor sol funcionar el trasplantament a llarg termini. <b>No cal que coincideixin totes.</b>'},
+  {icon:'flask',h:'La prova creuada',p:'Just abans del trasplantament s\'enfronten cèl·lules del donant amb la sang del receptor. Si el receptor té {{ac|anticossos}} contra aquell donant, la {{pc|prova creuada}} és <b>positiva</b> i normalment no es trasplanta.'}
+ ],
+ steps:[
+  {t:'abo',donor:'A',ok:['A','AB'],
+   exp:'Un ronyó del grup <b>A</b> pot anar a receptors <b>A</b> o <b>AB</b>. El grup O és donant universal i l\'AB receptor universal. El factor Rh (+/−) no influeix en la compatibilitat del trasplantament renal. Tot i això, molts sistemes d\'assignació prioritzen receptors del mateix grup per no perjudicar els que són O, que només poden rebre de donants O.'},
+  {t:'profiles',donor:'A',
+   pats:[
+    {n:'Lucía',d:'29 anys · 6 anys en diàlisi',g:'B',hla:'5/6',pc:'No escau',ok:0,why:'La Lucía és del grup B: no és compatible amb un ronyó del grup A, encara que el seu HLA s\'assembli molt i porti més temps esperant.'},
+    {n:'Javier',d:'56 anys · 4 anys en diàlisi',g:'A',hla:'3/6',pc:'Negativa',ok:1,why:'En Javier és del grup A i la seva prova creuada és negativa: no té anticossos contra aquest donant. Amb 3 de 6 coincidències HLA el trasplantament és possible.'},
+    {n:'Carmen',d:'41 anys · 2 anys en diàlisi',g:'A',hla:'5/6',pc:'Positiva',ok:0,why:'La Carmen té el grup correcte i més coincidències HLA, però la seva prova creuada és positiva: els seus anticossos atacarien aquest ronyó.'}],
+   exp:'<b>No n\'hi ha prou amb el grup sanguini</b>, ni amb tenir moltes coincidències HLA: la prova creuada ha de ser negativa.'},
+  {t:'choice',q:'Per què la Carmen pot tenir anticossos contra el ronyó d\'un donant?',
+   o:[{x:'Per transfusions, embarassos o trasplantaments anteriors',ok:1},
+      {x:'Per menjar malament',fb:'L\'alimentació no genera anticossos contra l\'HLA d\'una altra persona.'},
+      {x:'Per ser del grup sanguini A',fb:'El grup sanguini no explica els anticossos contra HLA.'}],
+   exp:'El contacte amb cèl·lules d\'una altra persona pot generar anticossos anti-HLA. Aquests pacients s\'anomenen {{hiper|hiperimmunitzats}} i els costa molt més trobar un ronyó. A Espanya hi ha un programa nacional específic per ajudar-los.'},
+  {t:'tf',items:[
+   {s:'Si donant i receptor tenen el mateix grup sanguini, el trasplantament ja és segur.',a:0,exp:'Fals. També hi influeixen l\'HLA, la prova creuada, l\'edat, l\'estat de salut i altres factors mèdics.'},
+   {s:'A la vida real, el coordinador tria lliurement a quin pacient donar el ronyó.',a:0,exp:'Fals. L\'assignació segueix criteris clínics i protocols oficials: compatibilitat, urgència mèdica, temps en llista, edat, programes per a hiperimmunitzats o criteris geogràfics, entre d\'altres. A Espanya s\'organitza amb l\'ONT (i a Catalunya, també amb l\'OCATT). Aquest joc només simplifica el raonament.'}]}
+ ]},
+{code:'AGAINST THE CLOCK',title:'Contrarellotge',tag:'El temps importa',icon:'clock',
+ learn:[
+  {icon:'clock',h:'Isquèmia freda',p:'És el temps que el ronyó passa fora del cos, refredat i sense reg sanguini. <b>Com més curt, millor funcionarà.</b> El ronyó aguanta força més que el cor, i en general s\'intenta que siguin menys de 24 hores'+AP_CA+'. Cada cas és diferent.'},
+  {icon:'snow',h:'Com es conserva',p:'El ronyó es renta amb un líquid de preservació especial i es guarda a uns <b>4 °C</b> en bosses estèrils dins d\'una nevera amb gel. Alguns hospitals fan servir màquines que el perfonen en fred. Mai no es congela.'},
+  {icon:'team',h:'Un equip enorme',p:'Coordinadors, intensivistes, cirurgians, anestesiòlegs, nefròlegs, immunòlegs, infermeria i tècnics. També conductors i pilots, i de vegades forces de seguretat per obrir pas. Si una baula falla, es perd temps.'}
+ ],
+ steps:[
+  {t:'order',q:'Ordena les fases del procés. Toca cada etapa en l\'ordre correcte.',
+   items:['Diagnòstic de la mort','Voluntat confirmada i consentiment','Extracció del ronyó','Conservació en fred','Transport a l\'hospital receptor','Implant al receptor'],
+   exp:'Primer es diagnostica la mort i després es confirma la voluntat. Només llavors s\'extreu el ronyó, que es conserva en fred durant el transport fins al quiròfan del receptor.'},
+  {t:'story',icon:'clock',h:'Mode contrarellotge',p:'El ronyó ja és fora. El rellotge d\'{{isq|isquèmia freda}} està en marxa. Tens <b>25 segons</b> per decisió.<br><br>Respondre bé val molt més que respondre ràpid: la rapidesa només dona un petit extra.',btn:'Activar el rellotge'},
+  {t:'choice',timed:25,isq:[1,3],q:'El ronyó s\'acaba d\'extreure. Com el conserves?',
+   o:[{x:'Líquid de preservació a uns 4 °C, en bosses estèrils i nevera amb gel',ok:1},
+      {x:'Congelat a −20 °C perquè aguanti més',fb:'La congelació forma cristalls de gel que destrueixen les cèl·lules. L\'òrgan quedaria inservible.'},
+      {x:'A temperatura ambient, ben tapat',fb:'Sense fred, les cèl·lules consumeixen la seva energia ràpidament i el ronyó es fa malbé.'}],
+   exp:'El fred alenteix el metabolisme de les cèl·lules i redueix el dany mentre l\'òrgan no rep sang.'},
+  {t:'choice',timed:25,isq:[2,5],q:'L\'hospital receptor és a 300 km. Una tempesta endarrereix l\'avió 5 hores. Què fas?',
+   o:[{x:'Coordinar amb l\'ONT i els hospitals i valorar anar per carretera si s\'hi arriba abans',ok:1},
+      {x:'Esperar l\'avió sense avisar ningú',fb:'Esperar sense coordinar allarga la isquèmia i deixa l\'hospital receptor sense informació.'},
+      {x:'Cancel·lar el trasplantament',fb:'Un retard té solució si es coordina bé. Cancel·lar seria malbaratar un òrgan.'}],
+   exp:'La coordinació entre hospitals permet canviar de pla en minuts: ambulància, avió o la combinació més ràpida.'},
+  {t:'choice',timed:25,isq:[1,4],q:'Mentre el ronyó viatja, què passa a l\'hospital receptor?',
+   o:[{x:'S\'avisa el receptor, se li fan anàlisis i es prepara el quiròfan',ok:1},
+      {x:'Res, s\'espera que arribi el ronyó',fb:'Si s\'espera, el ronyó arribaria i encara faltarien hores de preparació.'},
+      {x:'Es cita el receptor d\'aquí a una setmana',fb:'Una setmana d\'espera no és compatible amb un òrgan conservat en fred.'}],
+   exp:'Treballar en paral·lel és clau: quan el ronyó arriba, el receptor i l\'equip quirúrgic ja estan preparats.'},
+  {t:'choice',timed:25,isq:[0,0],q:'Per què no es guarda el ronyó uns quants dies a la nevera “per si de cas”?',
+   o:[{x:'Perquè com més temps passa sense reg, més es fa malbé i pitjor funcionarà',ok:1},
+      {x:'Perquè la nevera es queda sense bateria',fb:'El problema no és tècnic: és biològic.'},
+      {x:'Sí que es pot: en fred dura setmanes',fb:'El fred endarrereix el dany, però no l\'atura.'}],
+   exp:'Una isquèmia llarga augmenta el risc que el ronyó trigui a funcionar o funcioni pitjor. Per això el temps importa tant.'}
+ ]},
+{code:'THE TRANSPLANT',title:'El trasplantament',tag:'El moment decisiu',icon:'kidney',
+ learn:[
+  {icon:'cut',h:'La cirurgia',p:'Es fa amb anestèsia general i sol durar entre 2 i 4 hores'+AP_CA+'. El cirurgià connecta el ronyó nou a una artèria i una vena del receptor, i el seu {{ur|urèter}} a la bufeta.'},
+  {icon:'immune',h:'El sistema immunitari',p:'És la defensa del cos: reconeix allò que no és propi (virus, bacteris…) i ho ataca. Per això pot reconèixer el ronyó donat com una cosa estranya.'},
+  {icon:'shield',h:'El rebuig',list:[
+    '<b>Hiperagut.</b> En minuts o hores, per anticossos previs. La prova creuada l\'evita i avui és molt rar.',
+    '<b>Agut.</b> Més freqüent els primers mesos. Moltes vegades es tracta amb èxit.',
+    '<b>Crònic.</b> Dany lent que avança amb els anys.']}
+ ],
+ steps:[
+  {t:'body',exp:'El ronyó trasplantat es col·loca habitualment a la {{fi|fossa ilíaca}}, a la part baixa de l\'abdomen, a un costat (sovint el dret). Queda a prop de grans vasos sanguinis i de la bufeta, i és una cirurgia menys agressiva que arribar a la posició original.'},
+  {t:'choice',q:'Què es fa normalment amb els ronyons originals del pacient?',
+   o:[{x:'Es deixen al seu lloc',ok:1},
+      {x:'S\'extreuen sempre en la mateixa operació',fb:'Treure\'ls faria l\'operació més llarga i arriscada sense benefici en la majoria de casos.'},
+      {x:'Es donen a un altre pacient',fb:'Són ronyons malalts: no serveixen per a trasplantament.'}],
+   exp:'Normalment es deixen on són. Només s\'extreuen en casos concrets, com infeccions repetides o ronyons poliquístics molt grans. Moltes persones trasplantades tenen tres ronyons!'},
+  {t:'match',q:'Connecta el ronyó. Toca un element del ronyó nou i després la seva destinació.',
+   pairs:[['Artèria del ronyó','Artèria ilíaca'],['Vena del ronyó','Vena ilíaca'],['Urèter','Bufeta']],
+   exp:'L\'artèria porta sang al ronyó, la vena la torna i l\'urèter condueix l\'orina fins a la bufeta. En treure les pinces, el ronyó rep sang i moltes vegades comença a produir orina al mateix quiròfan.'},
+  {t:'choice',q:'Després de l\'operació, el ronyó triga uns dies a funcionar i el pacient necessita alguna diàlisi. Què vol dir?',
+   o:[{x:'Pot passar i moltes vegades el ronyó comença a funcionar després',ok:1},
+      {x:'Que el trasplantament ha fracassat',fb:'No necessàriament. És una situació coneguda que es vigila de prop.'},
+      {x:'Que cal treure el ronyó immediatament',fb:'S\'esperen i s\'estudien els motius abans de prendre decisions.'}],
+   exp:'S\'anomena funció retardada de l\'{{inj|empelt}}. És més freqüent amb donant mort i amb isquèmies llargues. Moltes vegades es recupera en dies o setmanes.'},
+  {t:'tf',items:[
+   {s:'Un episodi de rebuig agut vol dir sempre perdre el ronyó.',a:0,exp:'Fals. El rebuig agut es detecta amb els controls i moltes vegades es tracta amb èxit ajustant la medicació.'}]}
+ ]},
+{code:'A NEW LIFE',title:'Una nova vida',tag:'El trasplantament no és el final del camí',icon:'life',
+ learn:[
+  {icon:'pill',h:'Immunosupressors',p:'Els {{inm|immunosupressors}} frenen el sistema immunitari perquè no ataqui el ronyó. <b>Es prenen de per vida, cada dia i a l\'hora indicada.</b>'},
+  {icon:'shield',h:'El preu de la protecció',p:'En frenar les defenses augmenta el risc d\'infeccions i d\'alguns tumors, sobretot de pell. També poden pujar la tensió, el sucre o el colesterol. Per això el seguiment és tan important.'},
+  {icon:'steth',h:'Revisions per sempre',p:'Molt freqüents al principi i més espaiades després. Amb anàlisis es mesura com funciona el ronyó i els nivells en sang d\'alguns medicaments.'}
+ ],
+ steps:[
+  {t:'story',icon:'users',h:'Coneix l\'Andrés',p:'<span class="ficticio">PACIENT FICTICI</span><br>L\'Andrés té 41 anys. Fa unes setmanes que té el ronyó nou. Els teus consells influiran en la seva salut: vigila els seus indicadors.',btn:'Començar el seguiment',pt:1},
+  {t:'choice',pt:1,quote:'“Han passat 6 mesos i em trobo genial. Ja puc deixar les pastilles?”',q:'Què li respons?',
+   o:[{x:'No. Si les deixa, el seu sistema immunitari pot rebutjar el ronyó',ok:1},
+      {x:'Sí, si es troba bé ja no calen',fb:'Trobar-se bé és precisament gràcies a la medicació. Deixar-la és una causa important de pèrdua del ronyó.'},
+      {x:'Les pot prendre només quan se\'n recordi',fb:'Els oblits freqüents afavoreixen el rebuig. La regularitat és clau.'}],
+   exp:'Els immunosupressors no es deixen ni es canvien mai sense indicació de l\'equip mèdic. Alarmes al mòbil i pastillers ajuden a no oblidar-los.'},
+  {t:'choice',pt:1,quote:'“Tinc 38,5 °C de febre des d\'ahir.”',q:'Què hauria de fer?',
+   o:[{x:'Contactar aviat amb el seu equip de trasplantament',ok:1},
+      {x:'Esperar una setmana a veure si passa',fb:'Amb les defenses frenades, una infecció es pot complicar ràpidament.'},
+      {x:'Prendre antibiòtics que li van sobrar',fb:'Automedicar-se és perillós: alguns fàrmacs interaccionen amb els immunosupressors.'}],
+   exp:'Les infeccions són un dels principals riscos després del trasplantament. Davant de febre o altres símptomes d\'alarma, cal consultar aviat.'},
+  {t:'choice',pt:1,quote:'“Aquest estiu em passaré el dia a la platja.”',q:'Què li recomanes?',
+   o:[{x:'Protecció solar alta, gorra i evitar les hores centrals',ok:1},
+      {x:'Res especial: posar-se moreno és sa',fb:'Amb immunosupressors el risc de càncer de pell és més alt.'},
+      {x:'Que no surti mai de casa',fb:'No cal tancar-se: n\'hi ha prou amb protegir-se bé.'}],
+   exp:'Protegir-se del sol i revisar la pell regularment forma part de la cura de per vida d\'una persona trasplantada.'},
+  {t:'choice',pt:1,quote:'“Un amic em recomana un suplement d\'herbes i beure molt suc d\'aranja.”',q:'Què li dius?',
+   o:[{x:'Que ho consulti abans: alguns productes i l\'aranja alteren els seus medicaments',ok:1},
+      {x:'Si és natural, no hi ha risc',fb:'Natural no vol dir innocu. Algunes plantes redueixen o augmenten els nivells dels immunosupressors.'}],
+   exp:'L\'aranja i algunes plantes, com l\'herba de Sant Joan, poden canviar els nivells en sang de certs immunosupressors. Sempre cal preguntar abans.'},
+  {t:'choice',pt:1,quote:'“Podré tornar a estudiar, treballar i fer esport?”',q:'Què li respons?',
+   o:[{x:'Sí, a poc a poc i amb el vistiplau del seu equip mèdic',ok:1},
+      {x:'No, ha de fer repòs la resta de la vida',fb:'Al contrari: l\'activitat física adaptada és molt recomanable.'}],
+   exp:'Recuperar la vida diària sense dependre de la diàlisi és un dels grans beneficis del trasplantament. L\'exercici i una dieta sana ajuden a cuidar el cor i el ronyó.'},
+  {t:'tf',items:[
+   {s:'Un trasplantament renal és una curació definitiva per sempre.',a:0,exp:'Fals. És un tractament, no una curació. En general millora la qualitat i l\'esperança de vida respecte de la diàlisi, però el ronyó pot perdre funció amb els anys. Algunes persones han de tornar a diàlisi o necessiten un nou trasplantament. Els ronyons de donant viu solen durar més.'}]}
+ ]}
+];
+
+/* ============ IDIOMA ============ */
+const UI_CA=[
+ // inici i introducció
+ ['Unidad de coordinación de trasplantes','Unitat de coordinació de trasplantaments'],
+ ['Una decisión puede salvar una vida.','Una decisió pot salvar una vida.'],
+ ['>5 misiones<','>5 missions<'],['>5-7 minutos<','>5-7 minuts<'],['>Sin registro<','>Sense registre<'],
+ ['Juego divulgativo. Casos y personajes ficticios.','Joc divulgatiu. Casos i personatges ficticis.'],
+ ['LLAMADA DE GUARDIA','TRUCADA DE GUÀRDIA'],
+ ['Eres responsable de la <b>coordinación de trasplantes</b> de un hospital.','Ets responsable de la <b>coordinació de trasplantaments</b> d\'un hospital.'],
+ ['Esta noche puede empezar un proceso en el que participan decenas de profesionales y del que depende la vida de una persona que espera un riñón.','Aquesta nit pot començar un procés en què participen desenes de professionals i del qual depèn la vida d\'una persona que espera un ronyó.'],
+ ['Supera 5 misiones y completa el trasplante.','Supera 5 missions i completa el trasplantament.'],
+ ['<b>Escenarios ficticios.</b> Los casos están simplificados para aprender. En la realidad, cada decisión sigue protocolos oficiales y la toman equipos de profesionales.','<b>Escenaris ficticis.</b> Els casos estan simplificats per aprendre. A la realitat, cada decisió segueix protocols oficials i la prenen equips de professionals.'],
+ ['<b>Consejo:</b> toca las palabras','<b>Consell:</b> toca les paraules'],['>subrayadas<','>subratllades<'],[' para ver qué significan.',' per veure què volen dir.'],
+ ['<b>PANEL</b>','<b>PANELL</b>'],['>Ver misiones<','>Veure les missions<'],
+ // panell
+ ['Progreso de la misión','Progrés de la missió'],[' aciertos</p>',' encerts</p>'],['Iniciar misión','Iniciar la missió'],['MISIÓN ','MISSIÓ '],
+ // briefing
+ ['>Misión ','>Missió '],['¡A la acción!','A l\'acció!'],['>Siguiente<','>Següent<'],['>Continuar<','>Continuar<'],
+ // pacient
+ ['Andrés · 41 años','Andrés · 41 anys'],['Trasplante renal · paciente ficticio','Trasplantament renal · pacient fictici'],['<span>Riñón</span>','<span>Ronyó</span>'],['<span>Bienestar</span>','<span>Benestar</span>'],
+ ['Isquemia fría (ficticia)','Isquèmia freda (fictícia)'],
+ // feedback
+ ['Se acabó el tiempo. La respuesta correcta era:','S\'ha acabat el temps. La resposta correcta era:'],['Lo correcto:','El correcte:'],['por rapidez.','per rapidesa.'],['Incluye +','Inclou +'],
+ ['¡Correcto!','Correcte!'],['Tiempo agotado','Temps esgotat'],['No exactamente','No exactament'],['>Era <b>VERDADERO','>Era <b>VERITAT'],['>Era <b>FALSO','>Era <b>FALS'],
+ ['Revisa la compatibilidad','Revisa la compatibilitat'],['¡Buen análisis!','Bona anàlisi!'],['No es la mejor opción','No és la millor opció'],
+ ['¡Secuencia perfecta!','Seqüència perfecta!'],['<h3>Casi</h3>','<h3>Gairebé</h3>'],['Has acertado ','Has encertat '],[' posiciones. El orden correcto es:',' posicions. L\'ordre correcte és:'],
+ ['¡Exacto!','Exacte!'],['No es ahí','No és aquí'],['Ahí están los riñones propios, que normalmente se dejan en su sitio.','Aquí hi ha els ronyons propis, que normalment es deixen al seu lloc.'],['En el tórax están el corazón y los pulmones.','Al tòrax hi ha el cor i els pulmons.'],
+ ['¡Riñón conectado!','Ronyó connectat!'],['Conectado, con errores','Connectat, amb errors'],['Has necesitado ','Has necessitat '],[' intentos de más.',' intents de més.'],[' intento de más.',' intent de més.'],
+ ['<b>Importante:</b> en la vida real nadie elige libremente. La asignación sigue criterios clínicos y protocolos oficiales, coordinados en España por la ONT, y tiene en cuenta muchos más factores.','<b>Important:</b> a la vida real ningú no tria lliurement. L\'assignació segueix criteris clínics i protocols oficials, coordinats a Espanya per l\'ONT (i a Catalunya també per l\'OCATT), i té en compte molts més factors.'],
+ // vertader/fals
+ ['¿Verdadero o falso?','Vertader o fals?'],['AFIRMACIÓN','AFIRMACIÓ'],[' FALSO</button>',' FALS</button>'],[' VERDADERO</button>',' VERTADER</button>'],
+ ['También puedes deslizar la tarjeta: izquierda falso, derecha verdadero.','També pots lliscar la targeta: esquerra fals, dreta vertader.'],
+ // ABO
+ ['>Donante<','>Donant<'],['Grupo sanguíneo ','Grup sanguini '],['Riñón disponible','Ronyó disponible'],['¿Qué grupos pueden recibir este riñón?','Quins grups poden rebre aquest ronyó?'],['Selecciona todos los compatibles.','Selecciona tots els compatibles.'],
+ ['<small>RECEPTOR</small>','<small>RECEPTOR</small>'],['>Comprobar<','>Comprovar<'],
+ // perfils
+ ['ESCENARIO FICTICIO SIMPLIFICADO','ESCENARI FICTICI SIMPLIFICAT'],['Riñón de donante grupo ','Ronyó de donant grup '],['Compara a los tres pacientes y elige al más adecuado en este escenario.','Compara els tres pacients i tria el més adequat en aquest escenari.'],
+ ['<small>Grupo</small>','<small>Grup</small>'],['<small>Prueba cruzada</small>','<small>Prova creuada</small>'],['HLA: coincidencias sobre 6 antígenos analizados.','HLA: coincidències sobre 6 antígens analitzats.'],['Proponer receptor','Proposar receptor'],
+ // ordre
+ ['Etapas disponibles','Etapes disponibles'],['Toca una etapa colocada para quitarla.','Toca una etapa col·locada per treure-la.'],['Comprobar orden','Comprovar l\'ordre'],
+ // cos
+ ['¿Dónde se coloca habitualmente el riñón trasplantado?','On es col·loca habitualment el ronyó trasplantat?'],['Toca una zona del cuerpo.','Toca una zona del cos.'],['>vejiga<','>bufeta<'],['>riñones propios<','>ronyons propis<'],
+ ['Vista frontal. El lado derecho del paciente aparece a tu izquierda.','Vista frontal. El costat dret del pacient apareix a la teva esquerra.'],['Colocar el riñón aquí','Col·locar el ronyó aquí'],
+ ['Zona lumbar (posición de los riñones propios)','Zona lumbar (posició dels ronyons propis)'],['Fosa ilíaca (parte baja del abdomen)','Fossa ilíaca (part baixa de l\'abdomen)'],['Tórax','Tòrax'],
+ // connexions
+ ['RIÑÓN NUEVO','RONYÓ NOU'],['Conexiones: ','Connexions: '],
+ // fi de missió
+ ['completada</div>','completada</div>'],['Isquemia fría de la partida: ','Isquèmia freda de la partida: '],['(cifra del juego).','(xifra del joc).'],['Muy buena coordinación.','Molt bona coordinació.'],['Aceptable, aunque se podía ganar tiempo.','Acceptable, tot i que es podia guanyar temps.'],['Demasiado larga: cada hora cuenta.','Massa llarga: cada hora compta.'],
+ ['</b> riñón ','</b> ronyó '],['/100, bienestar ','/100, benestar '],['Gracias a tus consejos, su riñón funciona muy bien.','Gràcies als teus consells, el seu ronyó funciona molt bé.'],['Algunos consejos han puesto en riesgo su riñón.','Alguns consells han posat en risc el seu ronyó.'],
+ ['<small>Aciertos</small>','<small>Encerts</small>'],['<small>Puntos misión</small>','<small>Punts missió</small>'],['<small>Bonus misión</small>','<small>Bonus missió</small>'],
+ ['Misión perfecta: +100 de bonus.','Missió perfecta: +100 de bonus.'],['Misión superada con nota: +50 de bonus.','Missió superada amb nota: +50 de bonus.'],['Sin bonus esta vez. Lo importante es lo que has aprendido.','Sense bonus aquesta vegada. El que importa és el que has après.'],
+ ['Reflexión final','Reflexió final'],['Volver al panel','Tornar al panell'],
+ // reflexió
+ ['Trasplante completado','Trasplantament completat'],['Todo empezó con una decisión generosa','Tot va començar amb una decisió generosa'],
+ ['Detrás de cada riñón trasplantado hay una persona que decidió donar y una familia que respetó su voluntad.','Darrere de cada ronyó trasplantat hi ha una persona que va decidir donar i una família que en va respectar la voluntat.'],
+ ['Y decenas de profesionales que trabajaron coordinados contra el reloj.','I desenes de professionals que van treballar coordinats contra rellotge.'],
+ ['<b>Habla con tu familia.</b> Si un día llega el momento, serán quienes transmitan tu decisión. Que la conozcan es lo más importante.','<b>Parla amb la teva família.</b> Si un dia arriba el moment, seran ells qui transmetran la teva decisió. Que la coneguin és el més important.'],
+ ['<b>Un solo donante fallecido puede ayudar a varias personas.</b> Y un donante vivo puede cambiar la vida de alguien cercano.','<b>Un sol donant mort pot ajudar diverses persones.</b> I un donant viu pot canviar la vida d\'algú proper.'],
+ ['Ver resultados','Veure els resultats'],
+ // resultats
+ ['Informe final de la misión','Informe final de la missió'],['<small>puntos</small>','<small>punts</small>'],
+ ['Coordinación de élite','Coordinació d\'elit'],['Has tomado decisiones con criterio de profesional. Ya sabes explicar cómo funciona un trasplante renal: compártelo.','Has pres decisions amb criteri professional. Ja saps explicar com funciona un trasplantament renal: comparteix-ho.'],
+ ['Coordinación experta','Coordinació experta'],['Dominas lo esencial del proceso. Repasa los detalles que se te escaparon y estarás al nivel de los mejores.','Domines l\'essencial del procés. Repassa els detalls que se t\'han escapat i estaràs al nivell dels millors.'],
+ ['Coordinación en formación','Coordinació en formació'],['Vas por buen camino. Cada error de hoy es algo que ya no olvidarás. ¿Lo intentas otra vez?','Vas pel bon camí. Cada error d\'avui és una cosa que ja no oblidaràs. Ho tornes a provar?'],
+ ['Primer turno de guardia','Primer torn de guàrdia'],['Nadie nace sabiendo: has descubierto un mundo complejo. Vuelve a jugar y verás cuánto has aprendido.','Ningú no neix ensenyat: has descobert un món complex. Torna a jugar i veuràs quant has après.'],
+ ['<small>Misiones</small>','<small>Missions</small>'],['<small>Tiempo</small>','<small>Temps</small>'],['<small>Decisiones</small>','<small>Decisions</small>'],['Bonus por completar el juego','Bonus per completar el joc'],
+ ['La donación salva vidas','La donació salva vides'],
+ ['Miles de personas esperan un riñón. Decidir ser donante y contárselo a tu familia es un gesto sencillo que puede devolver a alguien una vida sin diálisis.','Milers de persones esperen un ronyó. Decidir ser donant i explicar-ho a la teva família és un gest senzill que pot retornar a algú una vida sense diàlisi.'],
+ ['Más información en la web de la Organización Nacional de Trasplantes: <a href="https://www.ont.es" target="_blank" rel="noopener">ont.es</a>','Més informació a les webs de l\'Organització Nacional de Trasplantaments, <a href="https://www.ont.es" target="_blank" rel="noopener">ont.es</a>, i de l\'Organització Catalana de Trasplantaments, <a href="https://trasplantaments.gencat.cat" target="_blank" rel="noopener">trasplantaments.gencat.cat</a>.'],
+ ['Contenido divulgativo basado en información de la ONT y de sociedades científicas de nefrología y trasplante. Los casos son ficticios y simplificados, y no sustituyen la valoración de profesionales sanitarios. Las cifras marcadas como orientativas varían según cada caso.','Contingut divulgatiu basat en informació de l\'ONT, l\'OCATT i societats científiques de nefrologia i trasplantament. Els casos són ficticis i simplificats, i no substitueixen la valoració de professionals sanitaris. Les xifres marcades com a orientatives varien segons cada cas.'],
+ ['Volver a jugar','Tornar a jugar'],
+ // rànquing
+ ['Ranking en directo','Rànquing en directe'],['Escribe un alias para aparecer en el ranking del stand. No uses tu nombre completo ni datos personales.','Escriu un àlies per aparèixer al rànquing de l\'estand. No facis servir el teu nom complet ni dades personals.'],
+ ['placeholder="Tu alias"','placeholder="El teu àlies"'],['>Enviar<','>Enviar<'],['Aún no hay puntuaciones. ¡Sé la primera persona!','Encara no hi ha puntuacions. Sigues la primera persona!'],
+ ['El alias debe tener entre 2 y 16 caracteres.','L\'àlies ha de tenir entre 2 i 16 caràcters.'],['Usa solo letras, números, espacios, puntos o guiones.','Fes servir només lletres, números, espais, punts o guionets.'],['Elige otro alias, por favor.','Tria un altre àlies, si us plau.'],
+ ['Enviando…','Enviant…'],['¡Hecho, ','Fet, '],['! Estás en la posición ','! Ets a la posició '],['¡Puntuación enviada!','Puntuació enviada!'],['No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.','No s\'ha pogut enviar. Revisa la connexió i torna-ho a provar.'],
+ // glossari
+ ['>Glosario<','>Glossari<'],['>Entendido<','>Entesos<']
+].sort((a,b)=>b[0].length-a[0].length);
+let LANG='es';
+try{const q=(location.hash||'').slice(1);LANG=q==='ca'||q==='es'?q:(localStorage.getItem('km_lang')||((navigator.language||'').toLowerCase().startsWith('ca')?'ca':'es'));}catch(e){}
+const loc=s=>{if(LANG!=='ca'||typeof s!=='string')return s;for(const [a,b] of UI_CA)if(s.includes(a))s=s.split(a).join(b);return s;};
+
+let MISSIONS=MISSIONS_ES,G=G_ES;
+function applyLang(){MISSIONS=LANG==='ca'?MISSIONS_CA:MISSIONS_ES;G=LANG==='ca'?G_CA:G_ES;document.documentElement.lang=LANG;if(window.KM)window.KM.MISSIONS=MISSIONS;}
+applyLang();
+
 /* ============ ESTADO ============ */
 const S={};
 function reset(){Object.assign(S,{score:0,correct:0,total:0,m:0,li:0,si:0,sub:0,done:0,t0:Date.now(),t1:0,ms:MISSIONS.map(()=>({c:0,t:0,pts:0,bonus:0})),isq:2,pt:{k:70,w:60},final:false,sent:null});}
@@ -522,7 +788,7 @@ function buzz(ok){try{navigator.vibrate&&navigator.vibrate(ok?18:[30,40,30]);}ca
 function render(html,after){
   clearTimers();
   app.classList.remove('in');
-  app.innerHTML=html;
+  app.innerHTML=loc(html);
   void app.offsetWidth;app.classList.add('in');
   window.scrollTo(0,0);
   after&&after();
@@ -553,8 +819,8 @@ function hud(){
 function sheet(kind,title,pts,body,btn,next){
   const box=$('#sheetbox');
   const icn=kind==='ok'?'check':kind==='no'?'x':'info';
-  box.innerHTML=`<div class="fbh ${kind}"><div class="badge">${ic(icn,2.4)}</div><h3>${title}</h3>${pts!==null?`<div class="pts">${pts>0?'+':''}${pts}</div>`:''}</div>
-   <div class="fbt">${fmt(body)}</div><button class="btn" id="sheetnext">${btn||'Continuar'}</button>`;
+  box.innerHTML=loc(`<div class="fbh ${kind}"><div class="badge">${ic(icn,2.4)}</div><h3>${title}</h3>${pts!==null?`<div class="pts">${pts>0?'+':''}${pts}</div>`:''}</div>
+   <div class="fbt">${fmt(body)}</div><button class="btn" id="sheetnext">${btn||'Continuar'}</button>`);
   $('#sheet').classList.add('on');
   $('#sheetnext').onclick=()=>{$('#sheet').classList.remove('on');next();};
   setTimeout(()=>$('#sheetnext').focus({preventScroll:true}),50);
@@ -563,7 +829,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('.term');if(!t)return;
   e.preventDefault();e.stopPropagation();
   const g=G[t.dataset.g];if(!g)return;
-  $('#glossbox').innerHTML=`<div class="eyebrow">Glosario</div><h3>${g[0]}</h3><p>${g[1]}</p><div style="height:14px"></div><button class="btn ghost" id="glossclose">Entendido</button>`;
+  $('#glossbox').innerHTML=loc(`<div class="eyebrow">Glosario</div><h3>${g[0]}</h3><p>${g[1]}</p><div style="height:14px"></div><button class="btn ghost" id="glossclose">Entendido</button>`);
   $('#gloss').classList.add('on');
   $('#glossclose').onclick=()=>$('#gloss').classList.remove('on');
 },true);
@@ -583,10 +849,12 @@ function splash(){
    <h1 class="title">KIDNEY<span>MISSION</span></h1>
    <p class="sub">Una decisión puede salvar una vida.</p>
    <div class="chips"><span class="chip">5 misiones</span><span class="chip">5-7 minutos</span><span class="chip">Sin registro</span></div>
+   <div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" class="${LANG==='es'?'on':''}">Castellano</button><button data-l="ca" class="${LANG==='ca'?'on':''}">Català</button></div>
   </div>
   <div class="actions"><button class="btn" id="go">${ic('life',2.2)} Start mission</button>
   <p class="src" style="text-align:center">Juego divulgativo. Casos y personajes ficticios.</p></div>`,()=>{
     $('#go').onclick=()=>{S.t0=Date.now();intro();};
+    document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('km_lang',LANG);}catch(e){}applyLang();splash();});
   });
 }
 
@@ -656,7 +924,7 @@ function patientPanel(){
 function updPatient(ok){
   S.pt.k=Math.max(5,Math.min(100,S.pt.k+(ok?6:-15)));
   S.pt.w=Math.max(5,Math.min(100,S.pt.w+(ok?8:-10)));
-  const el=$('#pt');if(el)el.outerHTML=patientPanel();
+  const el=$('#pt');if(el)el.outerHTML=loc(patientPanel());
 }
 
 /* --- elección (con o sin temporizador) --- */
@@ -824,7 +1092,7 @@ function stBody(st){
   </svg></div><div class="zlabel" id="zl">&nbsp;</div><p class="hint">Vista frontal. El lado derecho del paciente aparece a tu izquierda.</p></div>
   <div class="actions"><button class="btn" id="go" disabled>Colocar el riñón aquí</button></div>`,()=>{
     let z=null;const zs=[...document.querySelectorAll('.zone')];
-    zs.forEach(e=>e.addEventListener('click',()=>{z=e.dataset.z;zs.forEach(o=>o.classList.toggle('sel',o.dataset.z===z));$('#zl').textContent=ZL[z];$('#go').disabled=false;}));
+    zs.forEach(e=>e.addEventListener('click',()=>{z=e.dataset.z;zs.forEach(o=>o.classList.toggle('sel',o.dataset.z===z));$('#zl').textContent=loc(ZL[z]);$('#go').disabled=false;}));
     $('#go').onclick=()=>{
       $('#go').disabled=true;const ok=z==='iliac';
       zs.forEach(o=>{o.style.pointerEvents='none';o.classList.remove('sel');if(o.dataset.z==='iliac')o.classList.add('ok');else if(o.dataset.z===z)o.classList.add('no');});
@@ -851,7 +1119,7 @@ function stMatch(st){
       if(sel===null){b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400);return;}
       if(+b.dataset.i===sel){
         lb.find(x=>+x.dataset.i===sel).className='done';b.className='done';sel=null;matched++;
-        $('#mh').textContent=`Conexiones: ${matched}/3`;buzz(true);
+        $('#mh').textContent=loc(`Conexiones: ${matched}/3`);buzz(true);
         if(matched===3){
           const ok=errors===0,d=award(ok);
           setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Riñón conectado!':'Conectado, con errores',d,(ok?'':`<p>Has necesitado ${errors} intento${errors>1?'s':''} de más.</p>`)+`<p>${st.exp}</p>`,null,next),400);
@@ -936,21 +1204,21 @@ function lbPanel(){
 }
 function lbBind(pct,sec){
   if(!LB_ON)return;
-  const show=me=>lbTop(5).then(l=>{$('#lbl').innerHTML=l.length?lbRows(l,me):'<p class="lbmsg">Aún no hay puntuaciones. ¡Sé la primera persona!</p>';}).catch(()=>{});
+  const show=me=>lbTop(5).then(l=>{$('#lbl').innerHTML=l.length?lbRows(l,me):loc('<p class="lbmsg">Aún no hay puntuaciones. ¡Sé la primera persona!</p>');}).catch(()=>{});
   show(S.sent);
   const f=$('#lbf');if(!f)return;
   f.onsubmit=async e=>{
     e.preventDefault();const m=$('#lbm');
     const [a,err]=cleanAlias($('#alias').value);
-    if(err){m.textContent=err;m.className='lbmsg err';return;}
-    $('#lbsend').disabled=true;m.className='lbmsg';m.textContent='Enviando…';
+    if(err){m.textContent=loc(err);m.className='lbmsg err';return;}
+    $('#lbsend').disabled=true;m.className='lbmsg';m.textContent=loc('Enviando…');
     try{
       const row={alias:a,score:S.score,pct,secs:Math.max(60,Math.min(7200,sec))};
       const pos=await lbSubmit(row);S.sent=row;
       f.remove();document.querySelector('#lb .lbmsg').remove();
-      m.innerHTML=pos?`¡Hecho, <b style="color:var(--tq)">${esc(a)}</b>! Estás en la posición <b style="color:var(--tq)">${pos}</b>.`:'¡Puntuación enviada!';
+      m.innerHTML=loc(pos?`¡Hecho, <b style="color:var(--tq)">${esc(a)}</b>! Estás en la posición <b style="color:var(--tq)">${pos}</b>.`:'¡Puntuación enviada!');
       show(row);
-    }catch(x){$('#lbsend').disabled=false;m.className='lbmsg err';m.textContent='No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.';}
+    }catch(x){$('#lbsend').disabled=false;m.className='lbmsg err';m.textContent=loc('No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.');}
   };
 }
 
