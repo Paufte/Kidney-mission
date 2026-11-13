@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#040a1c">
+<title>Kidney Mission</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Mission-control HUD: one dark navy world, turquoise = vital/success, electric blue = interface, single column mobile */
+  --bg:#040a1c;
+  --panel:#0b1736;
+  --line:rgba(96,170,255,.20);
+  --tq:#22e4c8;
+  --blue:#2f7bff;
+  --txt:#eef5ff;
+  --mut:#93a8c8;
+  --bad:#ff5d73;
+  --warn:#ffb547;
+  --f-disp:"Chakra Petch","Rajdhani","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",Roboto,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--txt);font-family:var(--f-body);font-size:16px;line-height:1.5;overflow-x:hidden;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--tq);outline-offset:2px}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+   radial-gradient(60% 40% at 85% 0%,rgba(47,123,255,.22),transparent 70%),
+   radial-gradient(50% 35% at 0% 100%,rgba(34,228,200,.14),transparent 70%),
+   linear-gradient(rgba(96,170,255,.05) 1px,transparent 1px) 0 0/28px 28px,
+   linear-gradient(90deg,rgba(96,170,255,.05) 1px,transparent 1px) 0 0/28px 28px,
+   var(--bg)}
+#app{position:relative;z-index:1;max-width:480px;overflow-x:clip;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px)}
+#app.in>*{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+#app.in>*:nth-child(2){animation-delay:.05s}
+#app.in>*:nth-child(3){animation-delay:.1s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+h1,h2,h3{font-family:var(--f-disp);margin:0;text-wrap:balance;letter-spacing:.01em}
+p{margin:0}
+.mut{color:var(--mut)}
+.eyebrow{font-family:var(--f-disp);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--tq)}
+.grow{flex:1}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;border:0;border-radius:14px;
+  font-family:var(--f-disp);font-weight:700;font-size:17px;letter-spacing:.12em;text-transform:uppercase;
+  background:linear-gradient(100deg,var(--tq),var(--blue));color:#03122a;box-shadow:0 8px 28px -8px rgba(34,228,200,.55);transition:transform .15s,filter .15s}
+.btn svg{width:22px;height:22px;flex:none}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{filter:grayscale(1) brightness(.5);box-shadow:none;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line);box-shadow:none;letter-spacing:.08em;font-size:15px;min-height:50px}
+.actions{position:sticky;bottom:0;padding-top:14px;margin-top:auto;display:flex;flex-direction:column;gap:10px;
+  background:linear-gradient(transparent,var(--bg) 30%)}
+
+.panel{background:linear-gradient(160deg,rgba(18,38,82,.85),rgba(8,18,44,.9));border:1px solid var(--line);border-radius:18px;padding:18px}
+
+/* HUD */
+.hud{display:flex;align-items:center;gap:10px;padding:4px 0 12px}
+.hud .tag{font-family:var(--f-disp);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .tag b{color:var(--tq);font-weight:700}
+.pill{margin-left:auto;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:rgba(11,23,54,.9);
+  font-family:var(--f-disp);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.isq{margin-left:0;color:#9fd8ff}
+.pill svg{width:16px;height:16px}
+.bar{height:4px;border-radius:4px;background:rgba(96,170,255,.15);overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--tq),var(--blue));transition:width .5s}
+.pop{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.15);color:var(--tq)}}
+
+/* splash */
+.splash{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding-top:6vh}
+.logo{width:150px;height:170px;position:relative}
+.logo svg{width:100%;height:100%;filter:drop-shadow(0 0 22px rgba(34,228,200,.45))}
+.logo .ring{position:absolute;inset:-14px;border:1px dashed rgba(34,228,200,.35);border-radius:50%;animation:spin 24s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{stroke-dasharray:160;stroke-dashoffset:160;animation:draw 2.4s ease-in-out infinite}
+@keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-160}}
+.title{font-size:44px;line-height:.95;font-weight:700;letter-spacing:.06em}
+.title span{display:block;background:linear-gradient(90deg,var(--tq),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:18px;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.chip{font-size:12px;padding:5px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+
+/* intro */
+.log{font-family:var(--f-disp);font-size:14px;color:var(--tq);letter-spacing:.08em}
+.story p{font-size:19px;line-height:1.45}
+.story p+p{margin-top:14px}
+.note{display:flex;gap:10px;font-size:13.5px;color:var(--mut);border-left:3px solid var(--warn);padding:10px 12px;background:rgba(255,181,71,.06);border-radius:0 10px 10px 0}
+.note b{color:var(--warn)}
+.note.real{border-color:var(--tq);background:rgba(34,228,200,.06)}
+.note.real b{color:var(--tq)}
+
+/* map */
+.map{display:flex;flex-direction:column;gap:0;position:relative}
+.node{display:flex;gap:14px;align-items:stretch;position:relative}
+.node .rail{display:flex;flex-direction:column;align-items:center;width:44px;flex:none}
+.node .dot{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);font-family:var(--f-disp);font-weight:700;color:var(--mut)}
+.node .dot svg{width:22px;height:22px}
+.node .ln{flex:1;width:2px;background:var(--line);min-height:14px}
+.node:last-child .ln{display:none}
+.node .info{padding:2px 0 18px;flex:1}
+.node .info h3{font-size:18px}
+.node .info .code{font-family:var(--f-disp);font-size:11px;letter-spacing:.16em;color:var(--mut)}
+.node .info p{font-size:14px;color:var(--mut)}
+.node.done .dot{background:rgba(34,228,200,.14);border-color:var(--tq);color:var(--tq)}
+.node.done .ln{background:var(--tq)}
+.node.cur .dot{background:linear-gradient(135deg,var(--tq),var(--blue));color:#03122a;border:0;box-shadow:0 0 0 6px rgba(34,228,200,.15);animation:beat 1.8s infinite}
+@keyframes beat{50%{box-shadow:0 0 0 11px rgba(34,228,200,.05)}}
+.node.lock{opacity:.5}
+.stars{color:var(--warn);letter-spacing:2px;font-size:13px}
+
+/* learn */
+.learn{flex:1;display:flex;flex-direction:column;gap:16px}
+.lcard{flex:1;display:flex;flex-direction:column;gap:14px;min-height:300px}
+.lcard .ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:rgba(34,228,200,.1);border:1px solid rgba(34,228,200,.35);color:var(--tq)}
+.lcard .ico svg{width:30px;height:30px}
+.lcard h2{font-size:26px}
+.lcard p{font-size:17px}
+.lcard ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.lcard li{padding:12px 14px;border-radius:12px;background:rgba(47,123,255,.08);border:1px solid var(--line);font-size:15.5px}
+.lcard li b{color:var(--tq);font-family:var(--f-disp);letter-spacing:.04em}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:8px;background:var(--line);transition:all .3s}
+.dots i.on{width:24px;background:var(--tq)}
+.approx{display:inline-block;font-size:11px;font-family:var(--f-disp);letter-spacing:.06em;color:var(--warn);border:1px solid rgba(255,181,71,.5);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:1px}
+
+/* terms */
+.term{background:none;border:0;padding:0;border-bottom:1.5px dotted var(--tq);color:var(--txt);font-weight:600}
+#gloss{position:fixed;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center;background:rgba(2,6,18,.6)}
+#gloss.on{display:flex}
+#gloss .box{width:100%;max-width:480px;margin:0 12px calc(env(safe-area-inset-bottom) + 12px);animation:rise .3s both}
+#gloss h3{color:var(--tq);font-size:20px;margin-bottom:6px}
+
+/* questions */
+.ctx{font-size:15px;color:var(--mut);padding:12px 14px;border:1px dashed var(--line);border-radius:12px;margin-bottom:14px}
+.ctx b{color:var(--txt)}
+.q{font-size:23px;line-height:1.25;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:rgba(11,23,54,.85);font-size:16px;transition:border-color .2s,background .2s,transform .1s}
+.opt:active{transform:scale(.99)}
+.opt .ol{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:14px;background:rgba(47,123,255,.18);color:#a9c8ff}
+.opt.ok{border-color:var(--tq);background:rgba(34,228,200,.12)}
+.opt.ok .ol{background:var(--tq);color:#03122a}
+.opt.no{border-color:var(--bad);background:rgba(255,93,115,.12)}
+.opt.no .ol{background:var(--bad);color:#2a0710}
+.opt.sel{border-color:var(--blue);background:rgba(47,123,255,.16)}
+.opts.locked .opt{pointer-events:none}
+.opts.locked .opt:not(.ok):not(.no){opacity:.45}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* timer */
+.timer{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-family:var(--f-disp);font-variant-numeric:tabular-nums}
+.timer .tb{flex:1;height:8px;border-radius:8px;background:rgba(96,170,255,.15);overflow:hidden}
+.timer .tb i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--warn),var(--tq));transform-origin:left;transition:transform 1s linear}
+.timer.low .tb i{background:var(--bad)}
+.timer span{min-width:38px;text-align:right;font-weight:700}
+
+/* true false */
+.tfcard{min-height:230px;display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:center;touch-action:pan-y;user-select:none;transition:transform .25s}
+.tfcard .claim{font-size:21px;font-family:var(--f-disp);font-weight:600;line-height:1.3}
+.tfbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.tfbtns button{min-height:62px;border-radius:14px;font-family:var(--f-disp);font-weight:700;letter-spacing:.1em;font-size:16px;border:1px solid}
+.tfbtns .f{border-color:rgba(255,93,115,.6);background:rgba(255,93,115,.1);color:#ff9aa8}
+.tfbtns .v{border-color:rgba(34,228,200,.6);background:rgba(34,228,200,.1);color:var(--tq)}
+.hint{font-size:12.5px;color:var(--mut);text-align:center;margin-top:8px}
+
+/* ABO */
+.donor{display:flex;align-items:center;gap:14px}
+.blood{width:64px;height:76px;flex:none;position:relative}
+.blood svg{width:100%;height:100%}
+.blood b{position:absolute;inset:22px 0 0;text-align:center;font-family:var(--f-disp);font-size:22px;color:#fff}
+.abogrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.abo{min-height:74px;border-radius:14px;border:1px solid var(--line);background:rgba(11,23,54,.85);font-family:var(--f-disp);font-size:26px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.abo small{font-size:11px;letter-spacing:.12em;color:var(--mut);font-weight:500}
+.abo.sel{border-color:var(--blue);background:rgba(47,123,255,.2);box-shadow:inset 0 0 0 1px var(--blue)}
+.abo.ok{border-color:var(--tq);background:rgba(34,228,200,.14)}
+.abo.no{border-color:var(--bad);background:rgba(255,93,115,.12)}
+
+/* profiles */
+.prof{display:flex;flex-direction:column;gap:10px}
+.pcard{text-align:left;width:100%;border:1px solid var(--line);border-radius:16px;background:rgba(11,23,54,.85);padding:14px;display:flex;flex-direction:column;gap:10px;transition:all .2s}
+.pcard .ph{display:flex;align-items:center;gap:12px}
+.av{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;background:linear-gradient(135deg,#1c3a7a,#0f2350);border:1px solid var(--line);flex:none}
+.pcard .ph h3{font-size:18px}
+.pcard .ph p{font-size:13px;color:var(--mut)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stats div{background:rgba(47,123,255,.08);border-radius:10px;padding:7px 4px;text-align:center}
+.stats small{display:block;font-size:10px;letter-spacing:.06em;color:var(--mut);text-transform:uppercase;line-height:1.2}
+.stats b{font-family:var(--f-disp);font-size:15px;font-variant-numeric:tabular-nums}
+.stats .neg{color:var(--tq)}.stats .pos{color:var(--bad)}
+.pcard.sel{border-color:var(--blue);box-shadow:0 0 0 2px rgba(47,123,255,.4)}
+.pcard.ok{border-color:var(--tq);background:rgba(34,228,200,.1)}
+.pcard.no{border-color:var(--bad);background:rgba(255,93,115,.08)}
+.ficticio{display:inline-flex;gap:6px;align-items:center;font-family:var(--f-disp);font-size:11px;letter-spacing:.14em;color:var(--warn);border:1px solid rgba(255,181,71,.45);border-radius:6px;padding:3px 8px;margin-bottom:10px}
+
+/* order */
+.slots{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.slot{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;border-radius:12px;border:1px dashed var(--line);font-size:15px;text-align:left;width:100%;background:transparent}
+.slot .n{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:13px;background:rgba(47,123,255,.15);color:#a9c8ff;flex:none}
+.slot.fill{border-style:solid;background:rgba(47,123,255,.1)}
+.slot.ok{border-color:var(--tq);background:rgba(34,228,200,.1)}
+.slot.no{border-color:var(--bad);background:rgba(255,93,115,.1)}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.pool button{padding:10px 14px;border-radius:12px;border:1px solid var(--blue);background:rgba(47,123,255,.12);font-size:15px;text-align:left}
+.pool button.used{visibility:hidden;position:absolute}
+
+/* body */
+.bodywrap{display:flex;justify-content:center;margin:4px 0 8px}
+.bodywrap svg{width:min(260px,70vw);height:auto;overflow:visible}
+.zone{cursor:pointer;fill:rgba(47,123,255,.12);stroke:rgba(96,170,255,.55);stroke-width:1.5;stroke-dasharray:4 4;transition:all .2s}
+.zone.sel{fill:rgba(47,123,255,.35);stroke:var(--blue);stroke-dasharray:none}
+.zone.ok{fill:rgba(34,228,200,.3);stroke:var(--tq);stroke-dasharray:none}
+.zone.no{fill:rgba(255,93,115,.25);stroke:var(--bad);stroke-dasharray:none}
+.newk{opacity:0;transition:opacity .6s .2s}
+.newk.on{opacity:1}
+.zlabel{text-align:center;min-height:24px;font-family:var(--f-disp);color:var(--tq);letter-spacing:.04em}
+
+/* match */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.match button{min-height:64px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(11,23,54,.85);font-size:14.5px;line-height:1.25}
+.match .l button{border-left:4px solid var(--blue)}
+.match .r button{border-right:4px solid var(--tq)}
+.match button.sel{border-color:var(--blue);background:rgba(47,123,255,.22)}
+.match button.done{border-color:var(--tq);background:rgba(34,228,200,.12);color:var(--tq);pointer-events:none}
+
+/* patient */
+.patient{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.patient .ph{display:flex;gap:12px;align-items:center}
+.meter{display:grid;grid-template-columns:72px 1fr 34px;gap:8px;align-items:center;font-size:12px;color:var(--mut)}
+.meter .tb{height:8px;border-radius:8px;background:rgba(96,170,255,.15);overflow:hidden}
+.meter .tb i{display:block;height:100%;border-radius:8px;transition:width .7s}
+.meter b{font-family:var(--f-disp);color:var(--txt);text-align:right;font-variant-numeric:tabular-nums}
+.quote{position:relative;padding:14px 16px;border-radius:4px 16px 16px 16px;background:rgba(47,123,255,.14);border:1px solid rgba(47,123,255,.35);font-size:17px;margin-bottom:14px}
+
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:20;display:none;align-items:flex-end;justify-content:center;background:rgba(2,6,18,.55)}
+#sheet.on{display:flex}
+#sheet .box{width:100%;max-width:480px;max-height:86%;overflow:auto;border-radius:22px 22px 0 0;border-bottom:0;padding:22px 18px calc(env(safe-area-inset-bottom) + 18px);animation:up .35s cubic-bezier(.2,.8,.2,1) both;display:flex;flex-direction:column;gap:12px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.fbh{display:flex;align-items:center;gap:12px}
+.fbh .badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none}
+.fbh .badge svg{width:24px;height:24px}
+.fbh.ok .badge{background:var(--tq);color:#03122a}
+.fbh.no .badge{background:var(--bad);color:#2a0710}
+.fbh.info .badge{background:var(--warn);color:#2a1a00}
+.fbh h3{font-size:22px}
+.fbh .pts{margin-left:auto;font-family:var(--f-disp);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.fbh.ok .pts{color:var(--tq)}.fbh.no .pts{color:var(--bad)}
+.fbt{font-size:16px}
+.fbt p+p{margin-top:10px}
+.fbt b{color:var(--tq)}
+
+/* results */
+.ring{width:170px;height:170px;margin:0 auto;position:relative}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .v b{font-family:var(--f-disp);font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.ring .v small{color:var(--mut);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{padding:14px;border-radius:14px;background:rgba(11,23,54,.85);border:1px solid var(--line)}
+.kpi small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.kpi b{font-family:var(--f-disp);font-size:26px;font-variant-numeric:tabular-nums}
+.rank{text-align:center}
+.rank h2{font-size:28px;background:linear-gradient(90deg,var(--tq),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.mrow:last-child{border:0}
+.big{font-size:20px;line-height:1.4;font-family:var(--f-disp);font-weight:600}
+a{color:var(--tq)}
+.src{font-size:12.5px;color:var(--mut)}
+.lang{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:rgba(11,23,54,.85)}
+.lang button{border:0;background:none;color:var(--mut);font-family:var(--f-disp);font-weight:600;font-size:15px;letter-spacing:.06em;padding:9px 18px;border-radius:9px;min-height:40px}
+.lang button.on{background:linear-gradient(100deg,var(--tq),var(--blue));color:#03122a}
+.lb{display:flex;flex-direction:column;gap:10px}
+.lbform{display:flex;gap:8px}
+.lbform input{flex:1;min-width:0;height:52px;border-radius:12px;border:1px solid var(--line);background:rgba(4,10,28,.8);color:var(--txt);font:inherit;font-size:17px;padding:0 14px}
+.lbform input:focus{outline:2px solid var(--tq);outline-offset:1px}
+.lbform .btn{width:auto;min-height:52px;padding:0 18px;font-size:15px}
+.lbrow{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.lbrow:last-child{border:0}
+.lbrow .p{font-family:var(--f-disp);font-weight:700;color:var(--mut)}
+.lbrow b{font-family:var(--f-disp);font-variant-numeric:tabular-nums}
+.lbrow.me{color:var(--tq)}
+.lbrow.me .p{color:var(--tq)}
+.lbmsg{font-size:14px;color:var(--mut)}
+.lbmsg.err{color:var(--bad)}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<main id="app" class="in"></main>
+<div id="sheet" role="dialog" aria-modal="true"><div class="box panel" id="sheetbox"></div></div>
+<div id="gloss" role="dialog" aria-modal="true"><div class="box panel" id="glossbox"></div></div>
+
+<script src="config.js"></script>
+<script>
+/* ============ ICONOS ============ */
+const P = {
+  heart:'<path d="M12 20s-7-4.4-9.3-8.8A5.2 5.2 0 0 1 12 6.1a5.2 5.2 0 0 1 9.3 5.1C19 15.6 12 20 12 20z"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5v1"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14a5 5 0 0 1 3 4.6V20"/>',
+  clock:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5M12 2.5V5"/>',
+  kidney:'<path d="M13 3C7.5 2.7 4 7.6 4 12.6S7.4 21.3 12.6 21c3.7-.2 5-3.4 3.6-6-.9-1.8-.9-3.6.3-5.1C18.4 7.6 18.3 3.3 13 3z"/>',
+  life:'<path d="M3 12h4l2-5 4 10 2-5h6"/>',
+  shield:'<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+  dna:'<path d="M7 3c0 6 10 6 10 12 0 3-2 5-2 6M17 3c0 6-10 6-10 12 0 3 2 5 2 6M8 7h8M8 17h8"/>',
+  flask:'<path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7 15h10"/>',
+  drop:'<path d="M12 3s6 6.6 6 11a6 6 0 0 1-12 0c0-4.4 6-11 6-11z"/>',
+  snow:'<path d="M12 2v20M4 7l16 10M20 7L4 17"/><path d="M9 3.5l3 2 3-2M9 20.5l3-2 3 2"/>',
+  team:'<circle cx="12" cy="7" r="3"/><circle cx="5" cy="10" r="2.2"/><circle cx="19" cy="10" r="2.2"/><path d="M7 20v-2a5 5 0 0 1 10 0v2M1.5 19v-1a3.5 3.5 0 0 1 4-3.4M22.5 19v-1a3.5 3.5 0 0 0-4-3.4"/>',
+  cut:'<path d="M4 20L15 9M15 9l3-5 2 2-5 3M8 16l2 2"/>',
+  immune:'<circle cx="12" cy="12" r="5"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5M5 5l3.5 3.5M15.5 15.5L19 19M19 5l-3.5 3.5M8.5 15.5L5 19"/>',
+  pill:'<rect x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.5 8.5l5 7"/>',
+  steth:'<path d="M5 3v6a4 4 0 0 0 8 0V3M9 13v2a5 5 0 0 0 10 0v-2"/><circle cx="19" cy="11" r="2"/>',
+  check:'<path d="M4.5 12.5l5 5L19.5 7"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  trophy:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/>'
+};
+const ic=(n,w)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||1.8}" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`;
+const AP='<span class="approx">DATO ORIENTATIVO</span>';
+
+/* ============ GLOSARIO ============ */
+const G_ES={
+  erc:['Enfermedad renal crónica','Pérdida progresiva y permanente de la función de los riñones. En fase avanzada se necesita diálisis o trasplante para vivir.'],
+  dial:['Diálisis','Tratamiento que sustituye parte del trabajo de los riñones: limpia la sangre con una máquina (hemodiálisis) o a través de la membrana del abdomen (diálisis peritoneal).'],
+  uci:['UCI','Unidad de Cuidados Intensivos: la zona del hospital donde se atiende a pacientes en estado crítico.'],
+  me:['Muerte encefálica','Cese irreversible de todas las funciones del cerebro, incluido el tronco cerebral. Médica y legalmente es la muerte de la persona. No es un coma: en el coma el cerebro sigue funcionando.'],
+  ont:['ONT','Organización Nacional de Trasplantes. Organismo público que coordina la donación y el trasplante de órganos en España.'],
+  hla:['HLA','Antígenos leucocitarios humanos. Proteínas en la superficie de las células que funcionan como un carné de identidad para el sistema inmunitario. Se heredan de los padres.'],
+  ac:['Anticuerpos','Proteínas de defensa que fabrica el sistema inmunitario para reconocer y atacar lo que considera extraño.'],
+  pc:['Prueba cruzada (crossmatch)','Análisis que enfrenta la sangre del receptor con células del donante para comprobar si el receptor tiene anticuerpos contra ese donante concreto.'],
+  hiper:['Paciente hiperinmunizado','Persona con muchos anticuerpos contra HLA, por transfusiones, embarazos o trasplantes previos. Le resulta mucho más difícil encontrar un donante compatible.'],
+  isq:['Isquemia fría','Tiempo que el órgano pasa enfriado y sin riego sanguíneo, desde que se conserva en frío hasta que se conecta a la circulación del receptor.'],
+  si:['Sistema inmunitario','Conjunto de células y órganos que defienden el cuerpo frente a infecciones y frente a todo lo que reconoce como extraño.'],
+  fi:['Fosa ilíaca','Zona de la parte baja del abdomen, a cada lado, cerca del hueso de la cadera.'],
+  ur:['Uréter','Tubo fino que lleva la orina desde el riñón hasta la vejiga.'],
+  inj:['Injerto','El órgano trasplantado. Aquí, el riñón nuevo.'],
+  inm:['Inmunosupresores','Medicamentos que reducen la actividad del sistema inmunitario para evitar que ataque al órgano trasplantado.']
+};
+const fmt=s=>s.replace(/\{\{(\w+)\|([^}]+)\}\}/g,'<button class="term" data-g="$1">$2</button>');
+
+/* ============ CONTENIDO ============ */
+const MISSIONS_ES=[
+{code:'THE DONOR',title:'El donante',tag:'El inicio de todo',icon:'heart',
+ learn:[
+  {icon:'heart',h:'¿Qué es donar un órgano?',p:'Es regalar un órgano para que siga funcionando en el cuerpo de otra persona. En España la donación es <b>altruista, anónima y gratuita</b>: nadie puede cobrar ni pagar por un órgano.'},
+  {icon:'users',h:'Dos tipos de donante',list:[
+    '<b>Donante vivo.</b> Una persona sana dona uno de sus dos riñones, normalmente a un familiar o alguien cercano. Antes pasa una evaluación médica y psicológica muy completa.',
+    '<b>Donante fallecido.</b> Tras el diagnóstico de la muerte en la {{uci|UCI}} de un hospital, si no hay contraindicaciones médicas y se respeta su voluntad.']},
+  {icon:'shield',h:'La coordinación de trasplantes',p:'Médicos y enfermeras del hospital que detectan posibles donantes, acompañan a la familia, comprueban que todo cumple la ley y organizan el proceso. En España todo se coordina con la {{ont|ONT}}.'}
+ ],
+ steps:[
+  {t:'choice',ctx:'<span class="ficticio">ESCENARIO FICTICIO</span><br><b>UCI · 03:20.</b> Un hombre de 48 años ingresa con una hemorragia cerebral muy grave. Todavía no se ha diagnosticado su fallecimiento.',
+   q:'¿Qué hace el equipo médico ahora?',
+   o:[{x:'Seguir tratándolo para intentar salvarle la vida',ok:1},
+      {x:'Empezar a preparar la extracción de sus órganos',fb:'Mientras exista posibilidad de salvarle, todo el esfuerzo va dirigido a ello.'},
+      {x:'Buscar ya un receptor para sus riñones',fb:'Nadie busca receptores para alguien que está siendo tratado.'}],
+   exp:'La prioridad absoluta es siempre el paciente. La posibilidad de donación solo se plantea en determinadas circunstancias, y nunca cambia el esfuerzo por salvarle.'},
+  {t:'choice',ctx:'Pese a todos los tratamientos, el cerebro ha dejado de funcionar por completo.',
+   q:'¿Quién diagnostica la {{me|muerte encefálica}}?',
+   o:[{x:'Médicos que no forman parte del equipo de trasplante, con pruebas que marca la ley',ok:1},
+      {x:'El equipo que va a hacer el trasplante',fb:'Si fuera así habría un conflicto de intereses. La ley lo prohíbe expresamente.'},
+      {x:'La familia, cuando lo decide',fb:'La muerte es un diagnóstico médico con criterios y pruebas establecidos.'}],
+   exp:'En España la ley exige que el diagnóstico lo hagan médicos ajenos a la extracción y al trasplante. La muerte encefálica es el cese irreversible de todas las funciones del cerebro: es la muerte de la persona y <b>no es un coma</b>.'},
+  {t:'choice',q:'Ya se ha certificado el fallecimiento. ¿Cuál es el siguiente paso?',
+   o:[{x:'Averiguar si expresó su voluntad y hablar con su familia, con respeto y apoyo',ok:1},
+      {x:'Extraer los órganos sin hablar con nadie: la ley dice que todos somos donantes',fb:'La ley española considera donante a quien no se opuso en vida, pero en la práctica siempre se habla con la familia para conocer y respetar la voluntad de la persona.'},
+      {x:'Solo se puede donar si llevaba encima el carné de donante',fb:'El carné no es imprescindible. Lo importante es que tu familia conozca tu deseo, porque serán quienes lo transmitan.'}],
+   exp:'Respetar la voluntad del donante es un pilar del sistema. La entrevista con la familia la hacen profesionales formados, y la decisión se respeta sea cual sea.'},
+  {t:'choice',q:'La familia confirma que él quería donar. ¿Qué se valora antes de aceptar la donación?',
+   o:[{x:'Su historia clínica y pruebas para descartar enfermedades transmisibles y ver cómo funcionan sus órganos',ok:1},
+      {x:'Solo la edad: a partir de cierta edad no se puede donar',fb:'No hay una edad límite fija. Cada caso se valora de forma individual.'},
+      {x:'Nada: cualquier órgano sirve',fb:'Hay que proteger al receptor. Se estudia cada órgano antes de aceptarlo.'}],
+   exp:'Se revisan antecedentes, análisis y pruebas de imagen para proteger al receptor y saber si cada órgano es válido.'},
+  {t:'tf',items:[
+   {s:'Una persona sana puede donar un riñón en vida a un familiar.',a:1,exp:'Sí. Se puede llevar una vida normal con un solo riñón, tras una evaluación médica y psicológica completa. En España el consentimiento del donante vivo se ratifica ante un juez para asegurar que es libre.'},
+   {s:'Se puede cobrar por donar un riñón si ambas partes están de acuerdo.',a:0,exp:'Falso. El comercio de órganos es ilegal en España y en la gran mayoría de países. La donación es siempre altruista.'},
+   {s:'La familia del donante fallecido y el receptor pueden conocerse en el hospital.',a:0,exp:'Falso. En España la donación de personas fallecidas es anónima: ni la familia del donante ni el receptor conocen la identidad del otro.'}]}
+ ]},
+{code:'FIND THE MATCH',title:'El receptor',tag:'Encontrar al receptor adecuado',icon:'dna',
+ learn:[
+  {icon:'users',h:'La lista de espera',p:'La forman personas con {{erc|enfermedad renal crónica}} avanzada. Mientras esperan, muchas dependen de la {{dial|diálisis}}: con hemodiálisis suelen ser 3 sesiones por semana de unas 4 horas. El riñón es el órgano que más se trasplanta.'},
+  {icon:'drop',h:'Grupo sanguíneo (ABO)',p:'Igual que en una transfusión, el grupo del donante debe ser compatible con el del receptor. Si no lo es, el {{si|sistema inmunitario}} atacaría el riñón casi de inmediato.'},
+  {icon:'dna',h:'HLA: tu huella inmunitaria',p:'Los {{hla|HLA}} son proteínas de tus células heredadas de tus padres. Cuanto más se parecen las del donante y las del receptor, mejor suele funcionar el trasplante a largo plazo. <b>No hace falta que coincidan todas.</b>'},
+  {icon:'flask',h:'La prueba cruzada',p:'Justo antes del trasplante se enfrentan células del donante con la sangre del receptor. Si el receptor tiene {{ac|anticuerpos}} contra ese donante, la {{pc|prueba cruzada}} es <b>positiva</b> y normalmente no se trasplanta.'}
+ ],
+ steps:[
+  {t:'abo',donor:'A',ok:['A','AB'],
+   exp:'Un riñón del grupo <b>A</b> puede ir a receptores <b>A</b> o <b>AB</b>. El grupo O es donante universal y el AB receptor universal. El factor Rh (+/−) no influye en la compatibilidad del trasplante renal. Aun así, muchos sistemas de asignación priorizan receptores del mismo grupo para no perjudicar a quienes son O, que solo pueden recibir de donantes O.'},
+  {t:'profiles',donor:'A',
+   pats:[
+    {n:'Lucía',d:'29 años · 6 años en diálisis',g:'B',hla:'5/6',pc:'No procede',ok:0,why:'Lucía es del grupo B: no es compatible con un riñón del grupo A, aunque su HLA se parezca mucho y lleve más tiempo esperando.'},
+    {n:'Javier',d:'56 años · 4 años en diálisis',g:'A',hla:'3/6',pc:'Negativa',ok:1,why:'Javier es del grupo A y su prueba cruzada es negativa: no tiene anticuerpos contra este donante. Con 3 de 6 coincidencias HLA el trasplante es posible.'},
+    {n:'Carmen',d:'41 años · 2 años en diálisis',g:'A',hla:'5/6',pc:'Positiva',ok:0,why:'Carmen tiene el grupo correcto y más coincidencias HLA, pero su prueba cruzada es positiva: sus anticuerpos atacarían este riñón.'}],
+   exp:'<b>No basta con el grupo sanguíneo</b>, ni con tener muchas coincidencias HLA: la prueba cruzada debe ser negativa.'},
+  {t:'choice',q:'¿Por qué Carmen puede tener anticuerpos contra el riñón de un donante?',
+   o:[{x:'Por transfusiones, embarazos o trasplantes anteriores',ok:1},
+      {x:'Por llevar una mala alimentación',fb:'La alimentación no genera anticuerpos contra el HLA de otra persona.'},
+      {x:'Por ser del grupo sanguíneo A',fb:'El grupo sanguíneo no explica los anticuerpos contra HLA.'}],
+   exp:'El contacto con células de otra persona puede generar anticuerpos anti-HLA. A estos pacientes se les llama {{hiper|hiperinmunizados}} y les cuesta mucho más encontrar un riñón. En España existe un programa nacional específico para ayudarles.'},
+  {t:'tf',items:[
+   {s:'Si donante y receptor tienen el mismo grupo sanguíneo, el trasplante ya es seguro.',a:0,exp:'Falso. También influyen el HLA, la prueba cruzada, la edad, el estado de salud y otros factores médicos.'},
+   {s:'En la vida real, el coordinador elige libremente a qué paciente dar el riñón.',a:0,exp:'Falso. La asignación sigue criterios clínicos y protocolos oficiales: compatibilidad, urgencia médica, tiempo en lista, edad, programas para hiperinmunizados o criterios geográficos, entre otros. En España se organiza con la ONT. Este juego solo simplifica el razonamiento.'}]}
+ ]},
+{code:'AGAINST THE CLOCK',title:'Contrarreloj',tag:'El tiempo importa',icon:'clock',
+ learn:[
+  {icon:'clock',h:'Isquemia fría',p:'Es el tiempo que el riñón pasa fuera del cuerpo, enfriado y sin riego sanguíneo. <b>Cuanto más corto, mejor funcionará.</b> El riñón aguanta bastante más que el corazón, y en general se intenta que sean menos de 24 horas'+AP+'. Cada caso es distinto.'},
+  {icon:'snow',h:'Cómo se conserva',p:'El riñón se lava con un líquido de preservación especial y se guarda a unos <b>4 °C</b> en bolsas estériles dentro de una nevera con hielo. Algunos hospitales usan máquinas que lo perfunden en frío. Nunca se congela.'},
+  {icon:'team',h:'Un equipo enorme',p:'Coordinadores, intensivistas, cirujanos, anestesistas, nefrólogos, inmunólogos, enfermería y técnicos. También conductores y pilotos, y a veces fuerzas de seguridad para despejar el camino. Si un eslabón falla, se pierde tiempo.'}
+ ],
+ steps:[
+  {t:'order',q:'Ordena las fases del proceso. Toca cada etapa en el orden correcto.',
+   items:['Diagnóstico de la muerte','Voluntad confirmada y consentimiento','Extracción del riñón','Conservación en frío','Transporte al hospital receptor','Implante en el receptor'],
+   exp:'Primero se diagnostica la muerte, después se confirma la voluntad. Solo entonces se extrae el riñón, que se conserva en frío durante el transporte hasta el quirófano del receptor.'},
+  {t:'story',icon:'clock',h:'Modo contrarreloj',p:'El riñón ya está fuera. El reloj de {{isq|isquemia fría}} está en marcha. Tienes <b>25 segundos</b> por decisión.<br><br>Responder bien vale mucho más que responder rápido: la rapidez solo da un pequeño extra.',btn:'Activar reloj'},
+  {t:'choice',timed:25,isq:[1,3],q:'El riñón acaba de extraerse. ¿Cómo lo conservas?',
+   o:[{x:'Líquido de preservación a unos 4 °C, en bolsas estériles y nevera con hielo',ok:1},
+      {x:'Congelado a −20 °C para que aguante más',fb:'La congelación forma cristales de hielo que destruyen las células. El órgano quedaría inservible.'},
+      {x:'A temperatura ambiente, bien tapado',fb:'Sin frío, las células consumen su energía rápidamente y el riñón se daña.'}],
+   exp:'El frío ralentiza el metabolismo de las células y reduce el daño mientras el órgano no recibe sangre.'},
+  {t:'choice',timed:25,isq:[2,5],q:'El hospital receptor está a 300 km. Una tormenta retrasa el avión 5 horas. ¿Qué haces?',
+   o:[{x:'Coordinar con la ONT y los hospitales y valorar ir por carretera si se llega antes',ok:1},
+      {x:'Esperar el avión sin avisar a nadie',fb:'Esperar sin coordinar alarga la isquemia y deja al hospital receptor sin información.'},
+      {x:'Cancelar el trasplante',fb:'Un retraso tiene solución si se coordina bien. Cancelar sería desperdiciar un órgano.'}],
+   exp:'La coordinación entre hospitales permite cambiar de plan en minutos: ambulancia, avión o la combinación más rápida.'},
+  {t:'choice',timed:25,isq:[1,4],q:'Mientras el riñón viaja, ¿qué ocurre en el hospital receptor?',
+   o:[{x:'Se avisa al receptor, se le hacen análisis y se prepara el quirófano',ok:1},
+      {x:'Nada, se espera a que llegue el riñón',fb:'Si se espera, el riñón llegaría y aún faltarían horas de preparación.'},
+      {x:'Se cita al receptor para dentro de una semana',fb:'Una semana de espera no es compatible con un órgano conservado en frío.'}],
+   exp:'Trabajar en paralelo es clave: cuando el riñón llega, el receptor y el equipo quirúrgico ya están preparados.'},
+  {t:'choice',timed:25,isq:[0,0],q:'¿Por qué no se guarda el riñón varios días en la nevera “por si acaso”?',
+   o:[{x:'Porque cuanto más tiempo pasa sin riego, más se daña y peor funcionará',ok:1},
+      {x:'Porque la nevera se queda sin batería',fb:'El problema no es técnico: es biológico.'},
+      {x:'Sí se puede: en frío dura semanas',fb:'El frío retrasa el daño, pero no lo detiene.'}],
+   exp:'Una isquemia larga aumenta el riesgo de que el riñón tarde en funcionar o funcione peor. Por eso el tiempo importa tanto.'}
+ ]},
+{code:'THE TRANSPLANT',title:'El trasplante',tag:'El momento decisivo',icon:'kidney',
+ learn:[
+  {icon:'cut',h:'La cirugía',p:'Se hace con anestesia general y suele durar entre 2 y 4 horas'+AP+'. El cirujano conecta el riñón nuevo a una arteria y una vena del receptor y su {{ur|uréter}} a la vejiga.'},
+  {icon:'immune',h:'El sistema inmunitario',p:'Es la defensa del cuerpo: reconoce lo que no es propio (virus, bacterias…) y lo ataca. Por eso puede reconocer el riñón donado como algo extraño.'},
+  {icon:'shield',h:'El rechazo',list:[
+    '<b>Hiperagudo.</b> En minutos u horas, por anticuerpos previos. La prueba cruzada lo evita y hoy es muy raro.',
+    '<b>Agudo.</b> Más frecuente en los primeros meses. Muchas veces se trata con éxito.',
+    '<b>Crónico.</b> Daño lento que avanza con los años.']}
+ ],
+ steps:[
+  {t:'body',exp:'El riñón trasplantado se coloca habitualmente en la {{fi|fosa ilíaca}}, en la parte baja del abdomen, a un lado (a menudo el derecho). Queda cerca de grandes vasos sanguíneos y de la vejiga, y es una cirugía menos agresiva que llegar a la posición original.'},
+  {t:'choice',q:'¿Qué se hace normalmente con los riñones originales del paciente?',
+   o:[{x:'Se dejan en su sitio',ok:1},
+      {x:'Siempre se extraen en la misma operación',fb:'Quitarlos haría la operación más larga y arriesgada sin beneficio en la mayoría de casos.'},
+      {x:'Se donan a otro paciente',fb:'Son riñones enfermos: no sirven para trasplante.'}],
+   exp:'Normalmente se dejan donde están. Solo se extraen en casos concretos, como infecciones repetidas o riñones poliquísticos muy grandes. ¡Muchas personas trasplantadas tienen tres riñones!'},
+  {t:'match',q:'Conecta el riñón. Toca un elemento del riñón nuevo y después su destino.',
+   pairs:[['Arteria del riñón','Arteria ilíaca'],['Vena del riñón','Vena ilíaca'],['Uréter','Vejiga']],
+   exp:'La arteria lleva sangre al riñón, la vena la devuelve y el uréter conduce la orina hasta la vejiga. Al retirar las pinzas, el riñón recibe sangre y muchas veces empieza a producir orina en el propio quirófano.'},
+  {t:'choice',q:'Tras la operación, el riñón tarda unos días en funcionar y el paciente necesita alguna diálisis. ¿Qué significa?',
+   o:[{x:'Puede ocurrir y muchas veces el riñón empieza a funcionar después',ok:1},
+      {x:'Que el trasplante ha fracasado',fb:'No necesariamente. Es una situación conocida que se vigila de cerca.'},
+      {x:'Que hay que quitar el riñón enseguida',fb:'Se esperan y estudian los motivos antes de tomar decisiones.'}],
+   exp:'Se llama función retrasada del {{inj|injerto}}. Es más frecuente con donante fallecido y con isquemias largas. Muchas veces se recupera en días o semanas.'},
+  {t:'tf',items:[
+   {s:'Un episodio de rechazo agudo significa siempre perder el riñón.',a:0,exp:'Falso. El rechazo agudo se detecta con los controles y muchas veces se trata con éxito ajustando la medicación.'}]}
+ ]},
+{code:'A NEW LIFE',title:'Una nueva vida',tag:'El trasplante no es el final del camino',icon:'life',
+ learn:[
+  {icon:'pill',h:'Inmunosupresores',p:'Los {{inm|inmunosupresores}} frenan el sistema inmunitario para que no ataque al riñón. <b>Se toman de por vida, todos los días y a la hora indicada.</b>'},
+  {icon:'shield',h:'El precio de la protección',p:'Al frenar las defensas aumenta el riesgo de infecciones y de algunos tumores, sobre todo de piel. También pueden subir la tensión, el azúcar o el colesterol. Por eso el seguimiento es tan importante.'},
+  {icon:'steth',h:'Revisiones para siempre',p:'Muy frecuentes al principio y más espaciadas después. Con análisis se mide cómo funciona el riñón y los niveles en sangre de algunos medicamentos.'}
+ ],
+ steps:[
+  {t:'story',icon:'users',h:'Conoce a Andrés',p:'<span class="ficticio">PACIENTE FICTICIO</span><br>Andrés tiene 41 años. Lleva unas semanas con su riñón nuevo. Tus consejos van a influir en su salud: vigila sus indicadores.',btn:'Empezar seguimiento',pt:1},
+  {t:'choice',pt:1,quote:'“Han pasado 6 meses y me encuentro genial. ¿Puedo dejar ya las pastillas?”',q:'¿Qué le respondes?',
+   o:[{x:'No. Si las deja, su sistema inmunitario puede rechazar el riñón',ok:1},
+      {x:'Sí, si se encuentra bien ya no hacen falta',fb:'Encontrarse bien es precisamente gracias a la medicación. Dejarla es una causa importante de pérdida del riñón.'},
+      {x:'Puede tomarlas solo cuando se acuerde',fb:'Los olvidos frecuentes favorecen el rechazo. La regularidad es clave.'}],
+   exp:'Los inmunosupresores nunca se dejan ni se cambian sin indicación del equipo médico. Alarmas en el móvil y pastilleros ayudan a no olvidarlos.'},
+  {t:'choice',pt:1,quote:'“Tengo 38,5 °C de fiebre desde ayer.”',q:'¿Qué debería hacer?',
+   o:[{x:'Contactar pronto con su equipo de trasplante',ok:1},
+      {x:'Esperar una semana a ver si se pasa',fb:'Con las defensas frenadas, una infección puede complicarse rápido.'},
+      {x:'Tomar antibióticos que le sobraron',fb:'Automedicarse es peligroso: algunos fármacos interaccionan con los inmunosupresores.'}],
+   exp:'Las infecciones son uno de los principales riesgos tras el trasplante. Ante fiebre u otros síntomas de alarma, hay que consultar pronto.'},
+  {t:'choice',pt:1,quote:'“Este verano me voy a pasar el día en la playa.”',q:'¿Qué le recomiendas?',
+   o:[{x:'Protección solar alta, gorra y evitar las horas centrales',ok:1},
+      {x:'Nada especial: broncearse es sano',fb:'Con inmunosupresores el riesgo de cáncer de piel es mayor.'},
+      {x:'Que no salga nunca de casa',fb:'No hace falta encerrarse: basta con protegerse bien.'}],
+   exp:'Protegerse del sol y revisar la piel con regularidad es parte del cuidado de por vida de una persona trasplantada.'},
+  {t:'choice',pt:1,quote:'“Un amigo me recomienda un suplemento de hierbas y beber mucho zumo de pomelo.”',q:'¿Qué le dices?',
+   o:[{x:'Que lo consulte antes: algunos productos y el pomelo alteran sus medicamentos',ok:1},
+      {x:'Si es natural, no hay riesgo',fb:'Natural no significa inocuo. Algunas plantas reducen o aumentan los niveles de los inmunosupresores.'}],
+   exp:'El pomelo y algunas plantas, como la hierba de San Juan, pueden cambiar los niveles en sangre de ciertos inmunosupresores. Siempre hay que preguntar antes.'},
+  {t:'choice',pt:1,quote:'“¿Podré volver a estudiar, trabajar y hacer deporte?”',q:'¿Qué le respondes?',
+   o:[{x:'Sí, poco a poco y con el visto bueno de su equipo médico',ok:1},
+      {x:'No, debe guardar reposo el resto de su vida',fb:'Al contrario: la actividad física adaptada es muy recomendable.'}],
+   exp:'Recuperar la vida diaria sin depender de la diálisis es uno de los grandes beneficios del trasplante. El ejercicio y una dieta sana ayudan a cuidar el corazón y el riñón.'},
+  {t:'tf',items:[
+   {s:'Un trasplante renal es una curación definitiva para siempre.',a:0,exp:'Falso. Es un tratamiento, no una curación. En general mejora la calidad y la esperanza de vida frente a la diálisis, pero el riñón puede perder función con los años. Algunas personas necesitan volver a diálisis o un nuevo trasplante. Los riñones de donante vivo suelen durar más.'}]}
+ ]}
+];
+
+/* ============ CONTINGUT EN CATALÀ ============ */
+const AP_CA='<span class="approx">DADA ORIENTATIVA</span>';
+const G_CA={
+  erc:['Malaltia renal crònica','Pèrdua progressiva i permanent de la funció dels ronyons. En fase avançada cal diàlisi o trasplantament per viure.'],
+  dial:['Diàlisi','Tractament que substitueix part de la feina dels ronyons: neteja la sang amb una màquina (hemodiàlisi) o a través de la membrana de l\'abdomen (diàlisi peritoneal).'],
+  uci:['UCI','Unitat de Cures Intensives: la zona de l\'hospital on s\'atén pacients en estat crític.'],
+  me:['Mort encefàlica','Cessament irreversible de totes les funcions del cervell, inclòs el tronc cerebral. Mèdicament i legalment és la mort de la persona. No és un coma: en el coma el cervell continua funcionant.'],
+  ont:['ONT i OCATT','L\'Organització Nacional de Trasplantaments (ONT) coordina la donació i el trasplantament d\'òrgans a Espanya. A Catalunya hi treballa conjuntament l\'Organització Catalana de Trasplantaments (OCATT).'],
+  hla:['HLA','Antígens leucocitaris humans. Proteïnes de la superfície de les cèl·lules que funcionen com un carnet d\'identitat per al sistema immunitari. S\'hereten dels pares.'],
+  ac:['Anticossos','Proteïnes de defensa que fabrica el sistema immunitari per reconèixer i atacar allò que considera estrany.'],
+  pc:['Prova creuada (crossmatch)','Anàlisi que enfronta la sang del receptor amb cèl·lules del donant per comprovar si el receptor té anticossos contra aquell donant concret.'],
+  hiper:['Pacient hiperimmunitzat','Persona amb molts anticossos contra HLA, per transfusions, embarassos o trasplantaments previs. Li és molt més difícil trobar un donant compatible.'],
+  isq:['Isquèmia freda','Temps que l\'òrgan passa refredat i sense reg sanguini, des que es conserva en fred fins que es connecta a la circulació del receptor.'],
+  si:['Sistema immunitari','Conjunt de cèl·lules i òrgans que defensen el cos de les infeccions i de tot allò que reconeix com a estrany.'],
+  fi:['Fossa ilíaca','Zona de la part baixa de l\'abdomen, a cada costat, a prop de l\'os del maluc.'],
+  ur:['Urèter','Tub prim que porta l\'orina des del ronyó fins a la bufeta.'],
+  inj:['Empelt','L\'òrgan trasplantat. Aquí, el ronyó nou.'],
+  inm:['Immunosupressors','Medicaments que redueixen l\'activitat del sistema immunitari per evitar que ataqui l\'òrgan trasplantat.']
+};
+const MISSIONS_CA=[
+{code:'THE DONOR',title:'El donant',tag:'L\'inici de tot',icon:'heart',
+ learn:[
+  {icon:'heart',h:'Què és donar un òrgan?',p:'És regalar un òrgan perquè continuï funcionant dins del cos d\'una altra persona. A Espanya la donació és <b>altruista, anònima i gratuïta</b>: ningú pot cobrar ni pagar per un òrgan.'},
+  {icon:'users',h:'Dos tipus de donant',list:[
+    '<b>Donant viu.</b> Una persona sana dona un dels seus dos ronyons, normalment a un familiar o algú proper. Abans passa una avaluació mèdica i psicològica molt completa.',
+    '<b>Donant mort.</b> Després del diagnòstic de la mort a la {{uci|UCI}} d\'un hospital, si no hi ha contraindicacions mèdiques i es respecta la seva voluntat.']},
+  {icon:'shield',h:'La coordinació de trasplantaments',p:'Metges i infermeres de l\'hospital que detecten possibles donants, acompanyen la família, comproven que tot compleix la llei i organitzen el procés. Tot es coordina amb l\'{{ont|ONT i l\'OCATT}}.'}
+ ],
+ steps:[
+  {t:'choice',ctx:'<span class="ficticio">ESCENARI FICTICI</span><br><b>UCI · 03:20.</b> Un home de 48 anys ingressa amb una hemorràgia cerebral molt greu. Encara no se n\'ha diagnosticat la mort.',
+   q:'Què fa ara l\'equip mèdic?',
+   o:[{x:'Continuar tractant-lo per intentar salvar-li la vida',ok:1},
+      {x:'Començar a preparar l\'extracció dels seus òrgans',fb:'Mentre hi hagi possibilitat de salvar-lo, tot l\'esforç s\'hi dedica.'},
+      {x:'Buscar ja un receptor per als seus ronyons',fb:'Ningú busca receptors per a algú que està sent tractat.'}],
+   exp:'La prioritat absoluta és sempre el pacient. La possibilitat de donació només es planteja en determinades circumstàncies, i mai no canvia l\'esforç per salvar-lo.'},
+  {t:'choice',ctx:'Malgrat tots els tractaments, el cervell ha deixat de funcionar del tot.',
+   q:'Qui diagnostica la {{me|mort encefàlica}}?',
+   o:[{x:'Metges que no formen part de l\'equip de trasplantament, amb proves que marca la llei',ok:1},
+      {x:'L\'equip que farà el trasplantament',fb:'Si fos així hi hauria un conflicte d\'interessos. La llei ho prohibeix expressament.'},
+      {x:'La família, quan ho decideix',fb:'La mort és un diagnòstic mèdic amb criteris i proves establerts.'}],
+   exp:'A Espanya la llei exigeix que el diagnòstic el facin metges aliens a l\'extracció i al trasplantament. La mort encefàlica és el cessament irreversible de totes les funcions del cervell: és la mort de la persona i <b>no és un coma</b>.'},
+  {t:'choice',q:'Ja s\'ha certificat la mort. Quin és el pas següent?',
+   o:[{x:'Esbrinar si va expressar la seva voluntat i parlar amb la família, amb respecte i suport',ok:1},
+      {x:'Extreure els òrgans sense parlar amb ningú: la llei diu que tots som donants',fb:'La llei espanyola considera donant qui no s\'hi va oposar en vida, però a la pràctica sempre es parla amb la família per conèixer i respectar la voluntat de la persona.'},
+      {x:'Només es pot donar si duia a sobre el carnet de donant',fb:'El carnet no és imprescindible. El més important és que la teva família conegui el teu desig, perquè serà qui el transmetrà.'}],
+   exp:'Respectar la voluntat del donant és un pilar del sistema. L\'entrevista amb la família la fan professionals formats, i la decisió es respecta sigui quina sigui.'},
+  {t:'choice',q:'La família confirma que ell volia donar. Què es valora abans d\'acceptar la donació?',
+   o:[{x:'La seva història clínica i proves per descartar malalties transmissibles i veure com funcionen els seus òrgans',ok:1},
+      {x:'Només l\'edat: a partir de certa edat no es pot donar',fb:'No hi ha una edat límit fixa. Cada cas es valora de manera individual.'},
+      {x:'Res: qualsevol òrgan serveix',fb:'Cal protegir el receptor. S\'estudia cada òrgan abans d\'acceptar-lo.'}],
+   exp:'Es revisen antecedents, anàlisis i proves d\'imatge per protegir el receptor i saber si cada òrgan és vàlid.'},
+  {t:'tf',items:[
+   {s:'Una persona sana pot donar un ronyó en vida a un familiar.',a:1,exp:'Sí. Es pot fer una vida normal amb un sol ronyó, després d\'una avaluació mèdica i psicològica completa. A Espanya el consentiment del donant viu es ratifica davant d\'un jutge per assegurar que és lliure.'},
+   {s:'Es pot cobrar per donar un ronyó si totes dues parts hi estan d\'acord.',a:0,exp:'Fals. El comerç d\'òrgans és il·legal a Espanya i a la gran majoria de països. La donació és sempre altruista.'},
+   {s:'La família del donant mort i el receptor es poden conèixer a l\'hospital.',a:0,exp:'Fals. A Espanya la donació de persones mortes és anònima: ni la família del donant ni el receptor coneixen la identitat de l\'altre.'}]}
+ ]},
+{code:'FIND THE MATCH',title:'El receptor',tag:'Trobar el receptor adequat',icon:'dna',
+ learn:[
+  {icon:'users',h:'La llista d\'espera',p:'La formen persones amb {{erc|malaltia renal crònica}} avançada. Mentre esperen, moltes depenen de la {{dial|diàlisi}}: amb hemodiàlisi solen ser 3 sessions per setmana d\'unes 4 hores. El ronyó és l\'òrgan que més es trasplanta.'},
+  {icon:'drop',h:'Grup sanguini (ABO)',p:'Igual que en una transfusió, el grup del donant ha de ser compatible amb el del receptor. Si no ho és, el {{si|sistema immunitari}} atacaria el ronyó gairebé immediatament.'},
+  {icon:'dna',h:'HLA: la teva empremta immunitària',p:'Els {{hla|HLA}} són proteïnes de les teves cèl·lules heretades dels pares. Com més s\'assemblen les del donant i les del receptor, millor sol funcionar el trasplantament a llarg termini. <b>No cal que coincideixin totes.</b>'},
+  {icon:'flask',h:'La prova creuada',p:'Just abans del trasplantament s\'enfronten cèl·lules del donant amb la sang del receptor. Si el receptor té {{ac|anticossos}} contra aquell donant, la {{pc|prova creuada}} és <b>positiva</b> i normalment no es trasplanta.'}
+ ],
+ steps:[
+  {t:'abo',donor:'A',ok:['A','AB'],
+   exp:'Un ronyó del grup <b>A</b> pot anar a receptors <b>A</b> o <b>AB</b>. El grup O és donant universal i l\'AB receptor universal. El factor Rh (+/−) no influeix en la compatibilitat del trasplantament renal. Tot i això, molts sistemes d\'assignació prioritzen receptors del mateix grup per no perjudicar els que són O, que només poden rebre de donants O.'},
+  {t:'profiles',donor:'A',
+   pats:[
+    {n:'Lucía',d:'29 anys · 6 anys en diàlisi',g:'B',hla:'5/6',pc:'No escau',ok:0,why:'La Lucía és del grup B: no és compatible amb un ronyó del grup A, encara que el seu HLA s\'assembli molt i porti més temps esperant.'},
+    {n:'Javier',d:'56 anys · 4 anys en diàlisi',g:'A',hla:'3/6',pc:'Negativa',ok:1,why:'En Javier és del grup A i la seva prova creuada és negativa: no té anticossos contra aquest donant. Amb 3 de 6 coincidències HLA el trasplantament és possible.'},
+    {n:'Carmen',d:'41 anys · 2 anys en diàlisi',g:'A',hla:'5/6',pc:'Positiva',ok:0,why:'La Carmen té el grup correcte i més coincidències HLA, però la seva prova creuada és positiva: els seus anticossos atacarien aquest ronyó.'}],
+   exp:'<b>No n\'hi ha prou amb el grup sanguini</b>, ni amb tenir moltes coincidències HLA: la prova creuada ha de ser negativa.'},
+  {t:'choice',q:'Per què la Carmen pot tenir anticossos contra el ronyó d\'un donant?',
+   o:[{x:'Per transfusions, embarassos o trasplantaments anteriors',ok:1},
+      {x:'Per menjar malament',fb:'L\'alimentació no genera anticossos contra l\'HLA d\'una altra persona.'},
+      {x:'Per ser del grup sanguini A',fb:'El grup sanguini no explica els anticossos contra HLA.'}],
+   exp:'El contacte amb cèl·lules d\'una altra persona pot generar anticossos anti-HLA. Aquests pacients s\'anomenen {{hiper|hiperimmunitzats}} i els costa molt més trobar un ronyó. A Espanya hi ha un programa nacional específic per ajudar-los.'},
+  {t:'tf',items:[
+   {s:'Si donant i receptor tenen el mateix grup sanguini, el trasplantament ja és segur.',a:0,exp:'Fals. També hi influeixen l\'HLA, la prova creuada, l\'edat, l\'estat de salut i altres factors mèdics.'},
+   {s:'A la vida real, el coordinador tria lliurement a quin pacient donar el ronyó.',a:0,exp:'Fals. L\'assignació segueix criteris clínics i protocols oficials: compatibilitat, urgència mèdica, temps en llista, edat, programes per a hiperimmunitzats o criteris geogràfics, entre d\'altres. A Espanya s\'organitza amb l\'ONT (i a Catalunya, també amb l\'OCATT). Aquest joc només simplifica el raonament.'}]}
+ ]},
+{code:'AGAINST THE CLOCK',title:'Contrarellotge',tag:'El temps importa',icon:'clock',
+ learn:[
+  {icon:'clock',h:'Isquèmia freda',p:'És el temps que el ronyó passa fora del cos, refredat i sense reg sanguini. <b>Com més curt, millor funcionarà.</b> El ronyó aguanta força més que el cor, i en general s\'intenta que siguin menys de 24 hores'+AP_CA+'. Cada cas és diferent.'},
+  {icon:'snow',h:'Com es conserva',p:'El ronyó es renta amb un líquid de preservació especial i es guarda a uns <b>4 °C</b> en bosses estèrils dins d\'una nevera amb gel. Alguns hospitals fan servir màquines que el perfonen en fred. Mai no es congela.'},
+  {icon:'team',h:'Un equip enorme',p:'Coordinadors, intensivistes, cirurgians, anestesiòlegs, nefròlegs, immunòlegs, infermeria i tècnics. També conductors i pilots, i de vegades forces de seguretat per obrir pas. Si una baula falla, es perd temps.'}
+ ],
+ steps:[
+  {t:'order',q:'Ordena les fases del procés. Toca cada etapa en l\'ordre correcte.',
+   items:['Diagnòstic de la mort','Voluntat confirmada i consentiment','Extracció del ronyó','Conservació en fred','Transport a l\'hospital receptor','Implant al receptor'],
+   exp:'Primer es diagnostica la mort i després es confirma la voluntat. Només llavors s\'extreu el ronyó, que es conserva en fred durant el transport fins al quiròfan del receptor.'},
+  {t:'story',icon:'clock',h:'Mode contrarellotge',p:'El ronyó ja és fora. El rellotge d\'{{isq|isquèmia freda}} està en marxa. Tens <b>25 segons</b> per decisió.<br><br>Respondre bé val molt més que respondre ràpid: la rapidesa només dona un petit extra.',btn:'Activar el rellotge'},
+  {t:'choice',timed:25,isq:[1,3],q:'El ronyó s\'acaba d\'extreure. Com el conserves?',
+   o:[{x:'Líquid de preservació a uns 4 °C, en bosses estèrils i nevera amb gel',ok:1},
+      {x:'Congelat a −20 °C perquè aguanti més',fb:'La congelació forma cristalls de gel que destrueixen les cèl·lules. L\'òrgan quedaria inservible.'},
+      {x:'A temperatura ambient, ben tapat',fb:'Sense fred, les cèl·lules consumeixen la seva energia ràpidament i el ronyó es fa malbé.'}],
+   exp:'El fred alenteix el metabolisme de les cèl·lules i redueix el dany mentre l\'òrgan no rep sang.'},
+  {t:'choice',timed:25,isq:[2,5],q:'L\'hospital receptor és a 300 km. Una tempesta endarrereix l\'avió 5 hores. Què fas?',
+   o:[{x:'Coordinar amb l\'ONT i els hospitals i valorar anar per carretera si s\'hi arriba abans',ok:1},
+      {x:'Esperar l\'avió sense avisar ningú',fb:'Esperar sense coordinar allarga la isquèmia i deixa l\'hospital receptor sense informació.'},
+      {x:'Cancel·lar el trasplantament',fb:'Un retard té solució si es coordina bé. Cancel·lar seria malbaratar un òrgan.'}],
+   exp:'La coordinació entre hospitals permet canviar de pla en minuts: ambulància, avió o la combinació més ràpida.'},
+  {t:'choice',timed:25,isq:[1,4],q:'Mentre el ronyó viatja, què passa a l\'hospital receptor?',
+   o:[{x:'S\'avisa el receptor, se li fan anàlisis i es prepara el quiròfan',ok:1},
+      {x:'Res, s\'espera que arribi el ronyó',fb:'Si s\'espera, el ronyó arribaria i encara faltarien hores de preparació.'},
+      {x:'Es cita el receptor d\'aquí a una setmana',fb:'Una setmana d\'espera no és compatible amb un òrgan conservat en fred.'}],
+   exp:'Treballar en paral·lel és clau: quan el ronyó arriba, el receptor i l\'equip quirúrgic ja estan preparats.'},
+  {t:'choice',timed:25,isq:[0,0],q:'Per què no es guarda el ronyó uns quants dies a la nevera “per si de cas”?',
+   o:[{x:'Perquè com més temps passa sense reg, més es fa malbé i pitjor funcionarà',ok:1},
+      {x:'Perquè la nevera es queda sense bateria',fb:'El problema no és tècnic: és biològic.'},
+      {x:'Sí que es pot: en fred dura setmanes',fb:'El fred endarrereix el dany, però no l\'atura.'}],
+   exp:'Una isquèmia llarga augmenta el risc que el ronyó trigui a funcionar o funcioni pitjor. Per això el temps importa tant.'}
+ ]},
+{code:'THE TRANSPLANT',title:'El trasplantament',tag:'El moment decisiu',icon:'kidney',
+ learn:[
+  {icon:'cut',h:'La cirurgia',p:'Es fa amb anestèsia general i sol durar entre 2 i 4 hores'+AP_CA+'. El cirurgià connecta el ronyó nou a una artèria i una vena del receptor, i el seu {{ur|urèter}} a la bufeta.'},
+  {icon:'immune',h:'El sistema immunitari',p:'És la defensa del cos: reconeix allò que no és propi (virus, bacteris…) i ho ataca. Per això pot reconèixer el ronyó donat com una cosa estranya.'},
+  {icon:'shield',h:'El rebuig',list:[
+    '<b>Hiperagut.</b> En minuts o hores, per anticossos previs. La prova creuada l\'evita i avui és molt rar.',
+    '<b>Agut.</b> Més freqüent els primers mesos. Moltes vegades es tracta amb èxit.',
+    '<b>Crònic.</b> Dany lent que avança amb els anys.']}
+ ],
+ steps:[
+  {t:'body',exp:'El ronyó trasplantat es col·loca habitualment a la {{fi|fossa ilíaca}}, a la part baixa de l\'abdomen, a un costat (sovint el dret). Queda a prop de grans vasos sanguinis i de la bufeta, i és una cirurgia menys agressiva que arribar a la posició original.'},
+  {t:'choice',q:'Què es fa normalment amb els ronyons originals del pacient?',
+   o:[{x:'Es deixen al seu lloc',ok:1},
+      {x:'S\'extreuen sempre en la mateixa operació',fb:'Treure\'ls faria l\'operació més llarga i arriscada sense benefici en la majoria de casos.'},
+      {x:'Es donen a un altre pacient',fb:'Són ronyons malalts: no serveixen per a trasplantament.'}],
+   exp:'Normalment es deixen on són. Només s\'extreuen en casos concrets, com infeccions repetides o ronyons poliquístics molt grans. Moltes persones trasplantades tenen tres ronyons!'},
+  {t:'match',q:'Connecta el ronyó. Toca un element del ronyó nou i després la seva destinació.',
+   pairs:[['Artèria del ronyó','Artèria ilíaca'],['Vena del ronyó','Vena ilíaca'],['Urèter','Bufeta']],
+   exp:'L\'artèria porta sang al ronyó, la vena la torna i l\'urèter condueix l\'orina fins a la bufeta. En treure les pinces, el ronyó rep sang i moltes vegades comença a produir orina al mateix quiròfan.'},
+  {t:'choice',q:'Després de l\'operació, el ronyó triga uns dies a funcionar i el pacient necessita alguna diàlisi. Què vol dir?',
+   o:[{x:'Pot passar i moltes vegades el ronyó comença a funcionar després',ok:1},
+      {x:'Que el trasplantament ha fracassat',fb:'No necessàriament. És una situació coneguda que es vigila de prop.'},
+      {x:'Que cal treure el ronyó immediatament',fb:'S\'esperen i s\'estudien els motius abans de prendre decisions.'}],
+   exp:'S\'anomena funció retardada de l\'{{inj|empelt}}. És més freqüent amb donant mort i amb isquèmies llargues. Moltes vegades es recupera en dies o setmanes.'},
+  {t:'tf',items:[
+   {s:'Un episodi de rebuig agut vol dir sempre perdre el ronyó.',a:0,exp:'Fals. El rebuig agut es detecta amb els controls i moltes vegades es tracta amb èxit ajustant la medicació.'}]}
+ ]},
+{code:'A NEW LIFE',title:'Una nova vida',tag:'El trasplantament no és el final del camí',icon:'life',
+ learn:[
+  {icon:'pill',h:'Immunosupressors',p:'Els {{inm|immunosupressors}} frenen el sistema immunitari perquè no ataqui el ronyó. <b>Es prenen de per vida, cada dia i a l\'hora indicada.</b>'},
+  {icon:'shield',h:'El preu de la protecció',p:'En frenar les defenses augmenta el risc d\'infeccions i d\'alguns tumors, sobretot de pell. També poden pujar la tensió, el sucre o el colesterol. Per això el seguiment és tan important.'},
+  {icon:'steth',h:'Revisions per sempre',p:'Molt freqüents al principi i més espaiades després. Amb anàlisis es mesura com funciona el ronyó i els nivells en sang d\'alguns medicaments.'}
+ ],
+ steps:[
+  {t:'story',icon:'users',h:'Coneix l\'Andrés',p:'<span class="ficticio">PACIENT FICTICI</span><br>L\'Andrés té 41 anys. Fa unes setmanes que té el ronyó nou. Els teus consells influiran en la seva salut: vigila els seus indicadors.',btn:'Començar el seguiment',pt:1},
+  {t:'choice',pt:1,quote:'“Han passat 6 mesos i em trobo genial. Ja puc deixar les pastilles?”',q:'Què li respons?',
+   o:[{x:'No. Si les deixa, el seu sistema immunitari pot rebutjar el ronyó',ok:1},
+      {x:'Sí, si es troba bé ja no calen',fb:'Trobar-se bé és precisament gràcies a la medicació. Deixar-la és una causa important de pèrdua del ronyó.'},
+      {x:'Les pot prendre només quan se\'n recordi',fb:'Els oblits freqüents afavoreixen el rebuig. La regularitat és clau.'}],
+   exp:'Els immunosupressors no es deixen ni es canvien mai sense indicació de l\'equip mèdic. Alarmes al mòbil i pastillers ajuden a no oblidar-los.'},
+  {t:'choice',pt:1,quote:'“Tinc 38,5 °C de febre des d\'ahir.”',q:'Què hauria de fer?',
+   o:[{x:'Contactar aviat amb el seu equip de trasplantament',ok:1},
+      {x:'Esperar una setmana a veure si passa',fb:'Amb les defenses frenades, una infecció es pot complicar ràpidament.'},
+      {x:'Prendre antibiòtics que li van sobrar',fb:'Automedicar-se és perillós: alguns fàrmacs interaccionen amb els immunosupressors.'}],
+   exp:'Les infeccions són un dels principals riscos després del trasplantament. Davant de febre o altres símptomes d\'alarma, cal consultar aviat.'},
+  {t:'choice',pt:1,quote:'“Aquest estiu em passaré el dia a la platja.”',q:'Què li recomanes?',
+   o:[{x:'Protecció solar alta, gorra i evitar les hores centrals',ok:1},
+      {x:'Res especial: posar-se moreno és sa',fb:'Amb immunosupressors el risc de càncer de pell és més alt.'},
+      {x:'Que no surti mai de casa',fb:'No cal tancar-se: n\'hi ha prou amb protegir-se bé.'}],
+   exp:'Protegir-se del sol i revisar la pell regularment forma part de la cura de per vida d\'una persona trasplantada.'},
+  {t:'choice',pt:1,quote:'“Un amic em recomana un suplement d\'herbes i beure molt suc d\'aranja.”',q:'Què li dius?',
+   o:[{x:'Que ho consulti abans: alguns productes i l\'aranja alteren els seus medicaments',ok:1},
+      {x:'Si és natural, no hi ha risc',fb:'Natural no vol dir innocu. Algunes plantes redueixen o augmenten els nivells dels immunosupressors.'}],
+   exp:'L\'aranja i algunes plantes, com l\'herba de Sant Joan, poden canviar els nivells en sang de certs immunosupressors. Sempre cal preguntar abans.'},
+  {t:'choice',pt:1,quote:'“Podré tornar a estudiar, treballar i fer esport?”',q:'Què li respons?',
+   o:[{x:'Sí, a poc a poc i amb el vistiplau del seu equip mèdic',ok:1},
+      {x:'No, ha de fer repòs la resta de la vida',fb:'Al contrari: l\'activitat física adaptada és molt recomanable.'}],
+   exp:'Recuperar la vida diària sense dependre de la diàlisi és un dels grans beneficis del trasplantament. L\'exercici i una dieta sana ajuden a cuidar el cor i el ronyó.'},
+  {t:'tf',items:[
+   {s:'Un trasplantament renal és una curació definitiva per sempre.',a:0,exp:'Fals. És un tractament, no una curació. En general millora la qualitat i l\'esperança de vida respecte de la diàlisi, però el ronyó pot perdre funció amb els anys. Algunes persones han de tornar a diàlisi o necessiten un nou trasplantament. Els ronyons de donant viu solen durar més.'}]}
+ ]}
+];
+
+/* ============ IDIOMA ============ */
+const UI_CA=[
+ // inici i introducció
+ ['Unidad de coordinación de trasplantes','Unitat de coordinació de trasplantaments'],
+ ['Una decisión puede salvar una vida.','Una decisió pot salvar una vida.'],
+ ['>5 misiones<','>5 missions<'],['>5-7 minutos<','>5-7 minuts<'],['>Sin registro<','>Sense registre<'],
+ ['Juego divulgativo. Casos y personajes ficticios.','Joc divulgatiu. Casos i personatges ficticis.'],
+ ['LLAMADA DE GUARDIA','TRUCADA DE GUÀRDIA'],
+ ['Eres responsable de la <b>coordinación de trasplantes</b> de un hospital.','Ets responsable de la <b>coordinació de trasplantaments</b> d\'un hospital.'],
+ ['Esta noche puede empezar un proceso en el que participan decenas de profesionales y del que depende la vida de una persona que espera un riñón.','Aquesta nit pot començar un procés en què participen desenes de professionals i del qual depèn la vida d\'una persona que espera un ronyó.'],
+ ['Supera 5 misiones y completa el trasplante.','Supera 5 missions i completa el trasplantament.'],
+ ['<b>Escenarios ficticios.</b> Los casos están simplificados para aprender. En la realidad, cada decisión sigue protocolos oficiales y la toman equipos de profesionales.','<b>Escenaris ficticis.</b> Els casos estan simplificats per aprendre. A la realitat, cada decisió segueix protocols oficials i la prenen equips de professionals.'],
+ ['<b>Consejo:</b> toca las palabras','<b>Consell:</b> toca les paraules'],['>subrayadas<','>subratllades<'],[' para ver qué significan.',' per veure què volen dir.'],
+ ['<b>PANEL</b>','<b>PANELL</b>'],['>Ver misiones<','>Veure les missions<'],
+ // panell
+ ['Progreso de la misión','Progrés de la missió'],[' aciertos</p>',' encerts</p>'],['Iniciar misión','Iniciar la missió'],['MISIÓN ','MISSIÓ '],
+ // briefing
+ ['>Misión ','>Missió '],['¡A la acción!','A l\'acció!'],['>Siguiente<','>Següent<'],['>Continuar<','>Continuar<'],
+ // pacient
+ ['Andrés · 41 años','Andrés · 41 anys'],['Trasplante renal · paciente ficticio','Trasplantament renal · pacient fictici'],['<span>Riñón</span>','<span>Ronyó</span>'],['<span>Bienestar</span>','<span>Benestar</span>'],
+ ['Isquemia fría (ficticia)','Isquèmia freda (fictícia)'],
+ // feedback
+ ['Se acabó el tiempo. La respuesta correcta era:','S\'ha acabat el temps. La resposta correcta era:'],['Lo correcto:','El correcte:'],['por rapidez.','per rapidesa.'],['Incluye +','Inclou +'],
+ ['¡Correcto!','Correcte!'],['Tiempo agotado','Temps esgotat'],['No exactamente','No exactament'],['>Era <b>VERDADERO','>Era <b>VERITAT'],['>Era <b>FALSO','>Era <b>FALS'],
+ ['Revisa la compatibilidad','Revisa la compatibilitat'],['¡Buen análisis!','Bona anàlisi!'],['No es la mejor opción','No és la millor opció'],
+ ['¡Secuencia perfecta!','Seqüència perfecta!'],['<h3>Casi</h3>','<h3>Gairebé</h3>'],['Has acertado ','Has encertat '],[' posiciones. El orden correcto es:',' posicions. L\'ordre correcte és:'],
+ ['¡Exacto!','Exacte!'],['No es ahí','No és aquí'],['Ahí están los riñones propios, que normalmente se dejan en su sitio.','Aquí hi ha els ronyons propis, que normalment es deixen al seu lloc.'],['En el tórax están el corazón y los pulmones.','Al tòrax hi ha el cor i els pulmons.'],
+ ['¡Riñón conectado!','Ronyó connectat!'],['Conectado, con errores','Connectat, amb errors'],['Has necesitado ','Has necessitat '],[' intentos de más.',' intents de més.'],[' intento de más.',' intent de més.'],
+ ['<b>Importante:</b> en la vida real nadie elige libremente. La asignación sigue criterios clínicos y protocolos oficiales, coordinados en España por la ONT, y tiene en cuenta muchos más factores.','<b>Important:</b> a la vida real ningú no tria lliurement. L\'assignació segueix criteris clínics i protocols oficials, coordinats a Espanya per l\'ONT (i a Catalunya també per l\'OCATT), i té en compte molts més factors.'],
+ // vertader/fals
+ ['¿Verdadero o falso?','Vertader o fals?'],['AFIRMACIÓN','AFIRMACIÓ'],[' FALSO</button>',' FALS</button>'],[' VERDADERO</button>',' VERTADER</button>'],
+ ['También puedes deslizar la tarjeta: izquierda falso, derecha verdadero.','També pots lliscar la targeta: esquerra fals, dreta vertader.'],
+ // ABO
+ ['>Donante<','>Donant<'],['Grupo sanguíneo ','Grup sanguini '],['Riñón disponible','Ronyó disponible'],['¿Qué grupos pueden recibir este riñón?','Quins grups poden rebre aquest ronyó?'],['Selecciona todos los compatibles.','Selecciona tots els compatibles.'],
+ ['<small>RECEPTOR</small>','<small>RECEPTOR</small>'],['>Comprobar<','>Comprovar<'],
+ // perfils
+ ['ESCENARIO FICTICIO SIMPLIFICADO','ESCENARI FICTICI SIMPLIFICAT'],['Riñón de donante grupo ','Ronyó de donant grup '],['Compara a los tres pacientes y elige al más adecuado en este escenario.','Compara els tres pacients i tria el més adequat en aquest escenari.'],
+ ['<small>Grupo</small>','<small>Grup</small>'],['<small>Prueba cruzada</small>','<small>Prova creuada</small>'],['HLA: coincidencias sobre 6 antígenos analizados.','HLA: coincidències sobre 6 antígens analitzats.'],['Proponer receptor','Proposar receptor'],
+ // ordre
+ ['Etapas disponibles','Etapes disponibles'],['Toca una etapa colocada para quitarla.','Toca una etapa col·locada per treure-la.'],['Comprobar orden','Comprovar l\'ordre'],
+ // cos
+ ['¿Dónde se coloca habitualmente el riñón trasplantado?','On es col·loca habitualment el ronyó trasplantat?'],['Toca una zona del cuerpo.','Toca una zona del cos.'],['>vejiga<','>bufeta<'],['>riñones propios<','>ronyons propis<'],
+ ['Vista frontal. El lado derecho del paciente aparece a tu izquierda.','Vista frontal. El costat dret del pacient apareix a la teva esquerra.'],['Colocar el riñón aquí','Col·locar el ronyó aquí'],
+ ['Zona lumbar (posición de los riñones propios)','Zona lumbar (posició dels ronyons propis)'],['Fosa ilíaca (parte baja del abdomen)','Fossa ilíaca (part baixa de l\'abdomen)'],['Tórax','Tòrax'],
+ // connexions
+ ['RIÑÓN NUEVO','RONYÓ NOU'],['Conexiones: ','Connexions: '],
+ // fi de missió
+ ['completada</div>','completada</div>'],['Isquemia fría de la partida: ','Isquèmia freda de la partida: '],['(cifra del juego).','(xifra del joc).'],['Muy buena coordinación.','Molt bona coordinació.'],['Aceptable, aunque se podía ganar tiempo.','Acceptable, tot i que es podia guanyar temps.'],['Demasiado larga: cada hora cuenta.','Massa llarga: cada hora compta.'],
+ ['</b> riñón ','</b> ronyó '],['/100, bienestar ','/100, benestar '],['Gracias a tus consejos, su riñón funciona muy bien.','Gràcies als teus consells, el seu ronyó funciona molt bé.'],['Algunos consejos han puesto en riesgo su riñón.','Alguns consells han posat en risc el seu ronyó.'],
+ ['<small>Aciertos</small>','<small>Encerts</small>'],['<small>Puntos misión</small>','<small>Punts missió</small>'],['<small>Bonus misión</small>','<small>Bonus missió</small>'],
+ ['Misión perfecta: +100 de bonus.','Missió perfecta: +100 de bonus.'],['Misión superada con nota: +50 de bonus.','Missió superada amb nota: +50 de bonus.'],['Sin bonus esta vez. Lo importante es lo que has aprendido.','Sense bonus aquesta vegada. El que importa és el que has après.'],
+ ['Reflexión final','Reflexió final'],['Volver al panel','Tornar al panell'],
+ // reflexió
+ ['Trasplante completado','Trasplantament completat'],['Todo empezó con una decisión generosa','Tot va començar amb una decisió generosa'],
+ ['Detrás de cada riñón trasplantado hay una persona que decidió donar y una familia que respetó su voluntad.','Darrere de cada ronyó trasplantat hi ha una persona que va decidir donar i una família que en va respectar la voluntat.'],
+ ['Y decenas de profesionales que trabajaron coordinados contra el reloj.','I desenes de professionals que van treballar coordinats contra rellotge.'],
+ ['<b>Habla con tu familia.</b> Si un día llega el momento, serán quienes transmitan tu decisión. Que la conozcan es lo más importante.','<b>Parla amb la teva família.</b> Si un dia arriba el moment, seran ells qui transmetran la teva decisió. Que la coneguin és el més important.'],
+ ['<b>Un solo donante fallecido puede ayudar a varias personas.</b> Y un donante vivo puede cambiar la vida de alguien cercano.','<b>Un sol donant mort pot ajudar diverses persones.</b> I un donant viu pot canviar la vida d\'algú proper.'],
+ ['Ver resultados','Veure els resultats'],
+ // resultats
+ ['Informe final de la misión','Informe final de la missió'],['<small>puntos</small>','<small>punts</small>'],
+ ['Coordinación de élite','Coordinació d\'elit'],['Has tomado decisiones con criterio de profesional. Ya sabes explicar cómo funciona un trasplante renal: compártelo.','Has pres decisions amb criteri professional. Ja saps explicar com funciona un trasplantament renal: comparteix-ho.'],
+ ['Coordinación experta','Coordinació experta'],['Dominas lo esencial del proceso. Repasa los detalles que se te escaparon y estarás al nivel de los mejores.','Domines l\'essencial del procés. Repassa els detalls que se t\'han escapat i estaràs al nivell dels millors.'],
+ ['Coordinación en formación','Coordinació en formació'],['Vas por buen camino. Cada error de hoy es algo que ya no olvidarás. ¿Lo intentas otra vez?','Vas pel bon camí. Cada error d\'avui és una cosa que ja no oblidaràs. Ho tornes a provar?'],
+ ['Primer turno de guardia','Primer torn de guàrdia'],['Nadie nace sabiendo: has descubierto un mundo complejo. Vuelve a jugar y verás cuánto has aprendido.','Ningú no neix ensenyat: has descobert un món complex. Torna a jugar i veuràs quant has après.'],
+ ['<small>Misiones</small>','<small>Missions</small>'],['<small>Tiempo</small>','<small>Temps</small>'],['<small>Decisiones</small>','<small>Decisions</small>'],['Bonus por completar el juego','Bonus per completar el joc'],
+ ['La donación salva vidas','La donació salva vides'],
+ ['Miles de personas esperan un riñón. Decidir ser donante y contárselo a tu familia es un gesto sencillo que puede devolver a alguien una vida sin diálisis.','Milers de persones esperen un ronyó. Decidir ser donant i explicar-ho a la teva família és un gest senzill que pot retornar a algú una vida sense diàlisi.'],
+ ['Más información en la web de la Organización Nacional de Trasplantes: <a href="https://www.ont.es" target="_blank" rel="noopener">ont.es</a>','Més informació a les webs de l\'Organització Nacional de Trasplantaments, <a href="https://www.ont.es" target="_blank" rel="noopener">ont.es</a>, i de l\'Organització Catalana de Trasplantaments, <a href="https://trasplantaments.gencat.cat" target="_blank" rel="noopener">trasplantaments.gencat.cat</a>.'],
+ ['Contenido divulgativo basado en información de la ONT y de sociedades científicas de nefrología y trasplante. Los casos son ficticios y simplificados, y no sustituyen la valoración de profesionales sanitarios. Las cifras marcadas como orientativas varían según cada caso.','Contingut divulgatiu basat en informació de l\'ONT, l\'OCATT i societats científiques de nefrologia i trasplantament. Els casos són ficticis i simplificats, i no substitueixen la valoració de professionals sanitaris. Les xifres marcades com a orientatives varien segons cada cas.'],
+ ['Volver a jugar','Tornar a jugar'],
+ // rànquing
+ ['Ranking en directo','Rànquing en directe'],['Escribe un alias para aparecer en el ranking del stand. No uses tu nombre completo ni datos personales.','Escriu un àlies per aparèixer al rànquing de l\'estand. No facis servir el teu nom complet ni dades personals.'],
+ ['placeholder="Tu alias"','placeholder="El teu àlies"'],['>Enviar<','>Enviar<'],['Aún no hay puntuaciones. ¡Sé la primera persona!','Encara no hi ha puntuacions. Sigues la primera persona!'],
+ ['El alias debe tener entre 2 y 16 caracteres.','L\'àlies ha de tenir entre 2 i 16 caràcters.'],['Usa solo letras, números, espacios, puntos o guiones.','Fes servir només lletres, números, espais, punts o guionets.'],['Elige otro alias, por favor.','Tria un altre àlies, si us plau.'],
+ ['Enviando…','Enviant…'],['¡Hecho, ','Fet, '],['! Estás en la posición ','! Ets a la posició '],['¡Puntuación enviada!','Puntuació enviada!'],['No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.','No s\'ha pogut enviar. Revisa la connexió i torna-ho a provar.'],
+ // glossari
+ ['>Glosario<','>Glossari<'],['>Inicio</a>','>Inici</a>'],['>Ranking</a>','>Rànquing</a>'],['Ver el ranking completo ›','Veure el rànquing complet ›'],['>Entendido<','>Entesos<']
+].sort((a,b)=>b[0].length-a[0].length);
+let LANG='es';
+try{const q=(location.hash||'').slice(1);LANG=q==='ca'||q==='es'?q:(localStorage.getItem('km_lang')||((navigator.language||'').toLowerCase().startsWith('ca')?'ca':'es'));}catch(e){}
+const loc=s=>{if(LANG!=='ca'||typeof s!=='string')return s;for(const [a,b] of UI_CA)if(s.includes(a))s=s.split(a).join(b);return s;};
+
+let MISSIONS=MISSIONS_ES,G=G_ES;
+function applyLang(){MISSIONS=LANG==='ca'?MISSIONS_CA:MISSIONS_ES;G=LANG==='ca'?G_CA:G_ES;document.documentElement.lang=LANG;if(window.KM)window.KM.MISSIONS=MISSIONS;}
+applyLang();
+
+/* ============ ESTADO ============ */
+const S={};
+function reset(){Object.assign(S,{score:0,correct:0,total:0,m:0,li:0,si:0,sub:0,done:0,t0:Date.now(),t1:0,ms:MISSIONS.map(()=>({c:0,t:0,pts:0,bonus:0})),isq:2,pt:{k:70,w:60},final:false,sent:null});}
+reset();
+window.KM={S,MISSIONS};
+
+const $=s=>document.querySelector(s);
+const app=$('#app');
+let timers=[];
+const clearTimers=()=>{timers.forEach(clearInterval);timers=[];};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+function buzz(ok){try{navigator.vibrate&&navigator.vibrate(ok?18:[30,40,30]);}catch(e){}}
+
+function render(html,after){
+  clearTimers();
+  app.classList.remove('in');
+  app.innerHTML=loc(html);
+  void app.offsetWidth;app.classList.add('in');
+  window.scrollTo(0,0);
+  after&&after();
+}
+
+/* puntuación: +100 por acierto (más un extra limitado en contrarreloj), −25 por fallo */
+function award(ok,bonus){
+  const ms=S.ms[S.m];let d;
+  S.total++;ms.t++;
+  if(ok){d=100+(bonus||0);S.correct++;ms.c++;}
+  else{d=-Math.min(25,S.score);}
+  S.score+=d;ms.pts+=d;
+  buzz(ok);
+  const p=$('#score');if(p){p.textContent=S.score;p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop');}
+  return d;
+}
+
+function hud(){
+  const M=MISSIONS[S.m];
+  const pct=Math.round(S.si/M.steps.length*100);
+  return `<div><div class="hud"><div class="tag"><b>M${S.m+1}</b> · ${M.code}</div>
+    ${S.m===2?`<div class="pill isq" title="Isquemia fría (ficticia)">${ic('snow')}<span id="isq">${S.isq} h</span></div>`:''}
+    <div class="pill">${ic('star')}<span id="score">${S.score}</span></div></div>
+    <div class="bar"><i style="width:${pct}%"></i></div></div>`;
+}
+
+/* ============ HOJA DE FEEDBACK Y GLOSARIO ============ */
+function sheet(kind,title,pts,body,btn,next){
+  const box=$('#sheetbox');
+  const icn=kind==='ok'?'check':kind==='no'?'x':'info';
+  box.innerHTML=loc(`<div class="fbh ${kind}"><div class="badge">${ic(icn,2.4)}</div><h3>${title}</h3>${pts!==null?`<div class="pts">${pts>0?'+':''}${pts}</div>`:''}</div>
+   <div class="fbt">${fmt(body)}</div><button class="btn" id="sheetnext">${btn||'Continuar'}</button>`);
+  $('#sheet').classList.add('on');
+  $('#sheetnext').onclick=()=>{$('#sheet').classList.remove('on');next();};
+  setTimeout(()=>$('#sheetnext').focus({preventScroll:true}),50);
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.term');if(!t)return;
+  e.preventDefault();e.stopPropagation();
+  const g=G[t.dataset.g];if(!g)return;
+  $('#glossbox').innerHTML=loc(`<div class="eyebrow">Glosario</div><h3>${g[0]}</h3><p>${g[1]}</p><div style="height:14px"></div><button class="btn ghost" id="glossclose">Entendido</button>`);
+  $('#gloss').classList.add('on');
+  $('#glossclose').onclick=()=>$('#gloss').classList.remove('on');
+},true);
+$('#gloss').addEventListener('click',e=>{if(e.target.id==='gloss')$('#gloss').classList.remove('on');});
+
+/* ============ PANTALLAS ============ */
+const LOGO=`<svg viewBox="0 0 120 140"><defs><linearGradient id="kg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22e4c8"/><stop offset="1" stop-color="#2f7bff"/></linearGradient></defs>
+<path d="M66 8C30 6 10 36 12 72s24 62 54 60c26-2 34-24 22-40-8-10-8-26 0-36C102 38 98 10 66 8z" fill="rgba(34,228,200,.08)" stroke="url(#kg)" stroke-width="4"/>
+<path d="M80 64c-10 2-16 8-24 8M80 84c-10-2-16-8-24-8" fill="none" stroke="url(#kg)" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+<path class="pulse" d="M4 74h26l6-14 9 30 8-24 6 8h57" fill="none" stroke="#eef5ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+function splash(){
+  reset();
+  render(`<div class="splash">
+   <div class="eyebrow">Unidad de coordinación de trasplantes</div>
+   <div class="logo"><div class="ring"></div>${LOGO}</div>
+   <h1 class="title">KIDNEY<span>MISSION</span></h1>
+   <p class="sub">Una decisión puede salvar una vida.</p>
+   <div class="chips"><span class="chip">5 misiones</span><span class="chip">5-7 minutos</span><span class="chip">Sin registro</span></div>
+   <div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" class="${LANG==='es'?'on':''}">Castellano</button><button data-l="ca" class="${LANG==='ca'?'on':''}">Català</button></div>
+  </div>
+  <div class="actions"><button class="btn" id="go">${ic('life',2.2)} Start mission</button>
+  <p class="src" style="text-align:center">Juego divulgativo. Casos y personajes ficticios. · <a href="./">Inicio</a> · <a href="ranking.html">Ranking</a></p></div>`,()=>{
+    $('#go').onclick=()=>{S.t0=Date.now();intro();};
+    document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('km_lang',LANG);}catch(e){}applyLang();splash();});
+  });
+}
+
+function intro(){
+  render(`<div class="stack" style="padding-top:10px"><div class="log">● 03:12 · LLAMADA DE GUARDIA</div></div>
+  <div class="story panel" style="margin-top:14px">
+   <p>Eres responsable de la <b>coordinación de trasplantes</b> de un hospital.</p>
+   <p>Esta noche puede empezar un proceso en el que participan decenas de profesionales y del que depende la vida de una persona que espera un riñón.</p>
+   <p style="color:var(--tq)">Supera 5 misiones y completa el trasplante.</p>
+  </div>
+  <div class="stack" style="margin-top:14px">
+   <div class="note"><span>${ic('info')}</span><span><b>Escenarios ficticios.</b> Los casos están simplificados para aprender. En la realidad, cada decisión sigue protocolos oficiales y la toman equipos de profesionales.</span></div>
+   <div class="note real"><span>${ic('check')}</span><span><b>Consejo:</b> toca las palabras <button class="term" data-g="si">subrayadas</button> para ver qué significan.</span></div>
+  </div>
+  <div class="actions"><button class="btn" id="go">Ver misiones</button></div>`,()=>{$('#go').onclick=map;});
+}
+
+function stars(ms){if(!ms.t)return'';const r=ms.c/ms.t;return r===1?'★★★':r>=.7?'★★☆':'★☆☆';}
+
+function map(){
+  const nodes=MISSIONS.map((M,i)=>{
+    const st=i<S.done?'done':i===S.done?'cur':'lock';
+    const ms=S.ms[i];
+    return `<div class="node ${st}"><div class="rail"><div class="dot">${st==='done'?ic('check',2.4):ic(M.icon)}</div><div class="ln"></div></div>
+     <div class="info"><div class="code">MISIÓN ${i+1} · ${M.code}</div><h3>${M.title}</h3>
+     <p>${st==='done'?`<span class="stars">${stars(ms)}</span> ${ms.c}/${ms.t} aciertos`:M.tag}</p></div></div>`;
+  }).join('');
+  render(`<div class="hud"><div class="tag"><b>PANEL</b> · Progreso de la misión</div><div class="pill">${ic('star')}<span id="score">${S.score}</span></div></div>
+  <div class="bar"><i style="width:${S.done/5*100}%"></i></div>
+  <div class="map">${nodes}</div>
+  <div class="actions"><button class="btn" id="go">Iniciar misión ${S.done+1}</button></div>`,()=>{
+    $('#go').onclick=()=>{S.m=S.done;S.li=0;S.si=0;S.sub=0;learn();};
+  });
+}
+
+function learn(){
+  const M=MISSIONS[S.m],c=M.learn[S.li],last=S.li===M.learn.length-1;
+  const body=c.list?`<ul>${c.list.map(x=>`<li>${fmt(x)}</li>`).join('')}</ul>`:`<p>${fmt(c.p)}</p>`;
+  render(`<div class="row" style="padding:4px 0 14px"><div class="eyebrow">Misión ${S.m+1} · ${M.code}</div><div class="pill" style="margin-left:auto">${ic('star')}<span>${S.score}</span></div></div>
+  ${S.li===0?`<div><h1 style="font-size:32px;margin-bottom:4px">${M.title}</h1><p class="mut" style="margin-bottom:14px">${M.tag}</p></div>`:''}
+  <div class="learn"><div class="lcard panel"><div class="eyebrow">Briefing ${S.li+1}/${M.learn.length}</div><div class="ico">${ic(c.icon)}</div><h2>${c.h}</h2>${body}</div>
+  <div class="dots">${M.learn.map((_,i)=>`<i class="${i===S.li?'on':''}"></i>`).join('')}</div></div>
+  <div class="actions">${S.li>0?'':''}<button class="btn" id="go">${last?'¡A la acción!':'Siguiente'}</button></div>`,()=>{
+    $('#go').onclick=()=>{if(last){S.si=0;step();}else{S.li++;learn();}};
+  });
+}
+
+function next(){S.sub=0;S.si++;if(S.si>=MISSIONS[S.m].steps.length)missionEnd();else step();}
+
+function step(){
+  const st=MISSIONS[S.m].steps[S.si];
+  ({choice:stChoice,tf:stTF,abo:stABO,profiles:stProfiles,order:stOrder,story:stStory,body:stBody,match:stMatch})[st.t](st);
+}
+
+/* --- historia --- */
+function stStory(st){
+  render(`${hud()}${st.pt?patientPanel():''}<div class="lcard panel" style="min-height:0"><div class="ico">${ic(st.icon)}</div><h2>${st.h}</h2><p>${fmt(st.p)}</p></div>
+  <div class="actions"><button class="btn" id="go">${st.btn||'Continuar'}</button></div>`,()=>{$('#go').onclick=next;});
+}
+
+/* --- paciente --- */
+function patientPanel(){
+  const m=(l,v,c)=>`<div class="meter"><span>${l}</span><div class="tb"><i style="width:${v}%;background:${c}"></i></div><b>${v}</b></div>`;
+  return `<div class="patient panel" id="pt"><div class="ph"><div class="av">AN</div><div><h3 style="font-size:17px">Andrés · 41 años</h3><p class="mut" style="font-size:13px">Trasplante renal · paciente ficticio</p></div></div>
+   ${m('Riñón',S.pt.k,'linear-gradient(90deg,#22e4c8,#2f7bff)')}${m('Bienestar',S.pt.w,'linear-gradient(90deg,#ffb547,#22e4c8)')}</div>`;
+}
+function updPatient(ok){
+  S.pt.k=Math.max(5,Math.min(100,S.pt.k+(ok?6:-15)));
+  S.pt.w=Math.max(5,Math.min(100,S.pt.w+(ok?8:-10)));
+  const el=$('#pt');if(el)el.outerHTML=loc(patientPanel());
+}
+
+/* --- elección (con o sin temporizador) --- */
+function stChoice(st){
+  const opts=shuffle(st.o);S.curOpts=opts;
+  render(`${hud()}<div>
+   ${st.pt?patientPanel():''}
+   ${st.ctx?`<div class="ctx">${fmt(st.ctx)}</div>`:''}
+   ${st.timed?`<div class="timer" id="tm">${ic('clock')}<div class="tb"><i id="tmb"></i></div><span id="tms">${st.timed}s</span></div>`:''}
+   ${st.quote?`<div class="quote">${st.quote}</div>`:''}
+   <h2 class="q">${fmt(st.q)}</h2>
+   <div class="opts" id="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="ol">${'ABC'[i]}</span><span>${o.x}</span></button>`).join('')}</div></div>`,()=>{
+    let left=st.timed,answered=false;
+    const answer=i=>{
+      if(answered)return;answered=true;clearTimers();
+      const box=$('#opts');box.classList.add('locked');
+      const btns=[...box.children];
+      opts.forEach((o,k)=>{if(o.ok)btns[k].classList.add('ok');});
+      const o=i>=0?opts[i]:null,ok=!!(o&&o.ok);
+      if(o&&!ok){btns[i].classList.add('no');btns[i].classList.add('shake');}
+      let bonus=0;
+      if(ok&&st.timed)bonus=Math.round(25*left/st.timed);
+      const d=award(ok,bonus);
+      if(st.isq){S.isq+=ok?st.isq[0]:st.isq[1];const e=$('#isq');if(e){e.textContent=S.isq+' h';e.parentNode.classList.add('pop');}}
+      if(st.pt)updPatient(ok);
+      const good=opts.find(x=>x.ok);
+      let body='';
+      if(i<0)body=`<p>Se acabó el tiempo. La respuesta correcta era: <b>${good.x}</b>.</p>`;
+      else if(!ok)body=`<p>${o.fb||''}</p><p>Lo correcto: <b>${good.x}</b>.</p>`;
+      body+=`<p>${st.exp}</p>`;
+      if(ok&&bonus)body+=`<p class="mut">Incluye +${bonus} por rapidez.</p>`;
+      setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Correcto!':i<0?'Tiempo agotado':'No exactamente',d,body,null,next),i<0?200:450);
+    };
+    $('#opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+    if(st.timed){
+      const bar=$('#tmb');
+      timers.push(setInterval(()=>{
+        left--;$('#tms').textContent=left+'s';bar.style.transform=`scaleX(${left/st.timed})`;
+        if(left<=7)$('#tm').classList.add('low');
+        if(left<=0)answer(-1);
+      },1000));
+    }
+  });
+}
+
+/* --- verdadero / falso con gesto de deslizar --- */
+function stTF(st){
+  const it=st.items[S.sub];
+  render(`${hud()}<div><div class="eyebrow" style="margin-bottom:10px">¿Verdadero o falso? · ${S.sub+1}/${st.items.length}</div>
+   <div class="tfcard panel" id="card"><div class="mut" style="font-size:13px">AFIRMACIÓN</div><div class="claim">${it.s}</div></div>
+   <div class="tfbtns"><button class="f" id="bf">${ic('x',2.4).replace('<svg','<svg width="18" height="18" style="vertical-align:-3px"')} FALSO</button><button class="v" id="bv">${ic('check',2.4).replace('<svg','<svg width="18" height="18" style="vertical-align:-3px"')} VERDADERO</button></div>
+   <p class="hint">También puedes deslizar la tarjeta: izquierda falso, derecha verdadero.</p></div>`,()=>{
+    let done=false;
+    const card=$('#card');
+    const ans=v=>{
+      if(done)return;done=true;
+      const ok=(v===!!it.a);
+      card.style.transform=`translateX(${v?60:-60}px) rotate(${v?6:-6}deg)`;
+      card.style.borderColor=ok?'var(--tq)':'var(--bad)';
+      const d=award(ok);
+      setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Correcto!':'No exactamente',d,`<p>Era <b>${it.a?'VERDADERO':'FALSO'}</b>.</p><p>${it.exp}</p>`,null,()=>{
+        S.sub++;if(S.sub<st.items.length)stTF(st);else next();
+      }),300);
+    };
+    $('#bf').onclick=()=>ans(false);$('#bv').onclick=()=>ans(true);
+    let x0=null,dx=0;
+    card.addEventListener('pointerdown',e=>{x0=e.clientX;dx=0;card.style.transition='none';card.setPointerCapture(e.pointerId);});
+    card.addEventListener('pointermove',e=>{if(x0===null)return;dx=e.clientX-x0;card.style.transform=`translateX(${dx}px) rotate(${dx/20}deg)`;});
+    const up=()=>{if(x0===null)return;x0=null;card.style.transition='';if(Math.abs(dx)>80)ans(dx>0);else card.style.transform='';};
+    card.addEventListener('pointerup',up);card.addEventListener('pointercancel',up);
+  });
+}
+
+/* --- compatibilidad ABO --- */
+const BLOOD=g=>`<div class="blood"><svg viewBox="0 0 64 76"><path d="M32 2s26 28 26 46a26 26 0 0 1-52 0C6 30 32 2 32 2z" fill="#b3263e" stroke="#ff5d73" stroke-width="2"/></svg><b>${g}</b></div>`;
+function stABO(st){
+  const sel=new Set();
+  render(`${hud()}<div><div class="panel donor">${BLOOD(st.donor)}<div><div class="eyebrow">Donante</div><h3 style="font-size:20px">Grupo sanguíneo ${st.donor}</h3><p class="mut" style="font-size:14px">Riñón disponible</p></div></div>
+   <h2 class="q" style="margin-top:18px">¿Qué grupos pueden recibir este riñón?</h2><p class="mut" style="margin-top:-8px">Selecciona todos los compatibles.</p>
+   <div class="abogrid" id="ag">${['O','A','B','AB'].map(g=>`<button class="abo" data-g="${g}">${g}<small>RECEPTOR</small></button>`).join('')}</div></div>
+   <div class="actions"><button class="btn" id="go" disabled>Comprobar</button></div>`,()=>{
+    const go=$('#go');
+    $('#ag').querySelectorAll('.abo').forEach(b=>b.onclick=()=>{const g=b.dataset.g;sel.has(g)?sel.delete(g):sel.add(g);b.classList.toggle('sel');go.disabled=!sel.size;});
+    go.onclick=()=>{
+      go.disabled=true;
+      const ok=sel.size===st.ok.length&&st.ok.every(g=>sel.has(g));
+      $('#ag').querySelectorAll('.abo').forEach(b=>{b.onclick=null;b.classList.remove('sel');b.classList.add(st.ok.includes(b.dataset.g)?'ok':(sel.has(b.dataset.g)?'no':'x'));});
+      const d=award(ok);
+      setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Correcto!':'Revisa la compatibilidad',d,`<p>${st.exp}</p>`,null,next),400);
+    };
+  });
+}
+
+/* --- comparación de perfiles --- */
+function stProfiles(st){
+  let pick=-1;
+  const cards=st.pats.map((p,i)=>`<button class="pcard" data-i="${i}"><div class="ph"><div class="av">${p.n.slice(0,2).toUpperCase()}</div><div><h3>${p.n}</h3><p>${p.d}</p></div></div>
+    <div class="stats"><div><small>Grupo</small><b>${p.g}</b></div><div><small>HLA</small><b>${p.hla}</b></div><div style="grid-column:span 2"><small>Prueba cruzada</small><b class="${p.pc==='Negativa'?'neg':p.pc==='Positiva'?'pos':''}">${p.pc}</b></div></div></button>`).join('');
+  render(`${hud()}<div><span class="ficticio">ESCENARIO FICTICIO SIMPLIFICADO</span>
+   <div class="ctx" style="display:flex;gap:12px;align-items:center">${BLOOD(st.donor).replace('class="blood"','class="blood" style="width:40px;height:48px"').replace('inset:22px','inset:14px')}<span><b>Riñón de donante grupo ${st.donor}.</b> Compara a los tres pacientes y elige al más adecuado en este escenario.</span></div>
+   <div class="prof" id="pf">${cards}</div>
+   <p class="hint">HLA: coincidencias sobre 6 antígenos analizados.</p></div>
+   <div class="actions"><button class="btn" id="go" disabled>Proponer receptor</button></div>`,()=>{
+    const go=$('#go'),cs=[...$('#pf').children];
+    cs.forEach(c=>c.onclick=()=>{pick=+c.dataset.i;cs.forEach(x=>x.classList.toggle('sel',x===c));go.disabled=false;});
+    go.onclick=()=>{
+      go.disabled=true;
+      const ok=!!st.pats[pick].ok;
+      cs.forEach((c,i)=>{c.onclick=null;c.classList.remove('sel');c.classList.add(st.pats[i].ok?'ok':'no');});
+      const d=award(ok);
+      const body=`<p>${st.exp}</p>${st.pats.map(p=>`<p>${p.ok?'✔':'✘'} <b>${p.n}:</b> ${p.why}</p>`).join('')}
+       <div class="note" style="margin-top:12px"><span>${ic('info')}</span><span><b>Importante:</b> en la vida real nadie elige libremente. La asignación sigue criterios clínicos y protocolos oficiales, coordinados en España por la ONT, y tiene en cuenta muchos más factores.</span></div>`;
+      setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Buen análisis!':'No es la mejor opción',d,body,null,next),400);
+    };
+  });
+}
+
+/* --- ordenar fases --- */
+function stOrder(st){
+  const pool=shuffle(st.items.map((x,i)=>({x,i})));
+  const placed=[];
+  const draw=()=>{
+    $('#slots').innerHTML=st.items.map((_,k)=>{const p=placed[k];return `<button class="slot ${p?'fill':''}" data-k="${k}"><span class="n">${k+1}</span><span>${p?p.x:'<span class="mut">…</span>'}</span></button>`;}).join('');
+    $('#pool').innerHTML=pool.map((p,k)=>`<button data-k="${k}" class="${placed.includes(p)?'used':''}">${p.x}</button>`).join('');
+    $('#go').disabled=placed.length<st.items.length;
+    $('#slots').querySelectorAll('.slot').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(placed[k]){placed.splice(k,1);draw();}});
+    $('#pool').querySelectorAll('button').forEach(b=>b.onclick=()=>{placed.push(pool[+b.dataset.k]);draw();});
+  };
+  render(`${hud()}<div><h2 class="q">${st.q}</h2><div class="slots" id="slots"></div><div class="eyebrow" style="margin-bottom:8px">Etapas disponibles</div><div class="pool" id="pool"></div>
+  <p class="hint">Toca una etapa colocada para quitarla.</p></div>
+  <div class="actions"><button class="btn" id="go" disabled>Comprobar orden</button></div>`,()=>{
+    draw();
+    $('#go').onclick=()=>{
+      $('#go').disabled=true;
+      const hits=placed.map((p,k)=>p.i===k);
+      const ok=hits.every(Boolean);
+      [...$('#slots').children].forEach((b,k)=>{b.onclick=null;b.classList.add(hits[k]?'ok':'no');});
+      const d=award(ok);
+      const body=(ok?'':`<p>Has acertado ${hits.filter(Boolean).length} de ${hits.length} posiciones. El orden correcto es:</p><p>${st.items.map((x,k)=>`${k+1}. ${x}`).join('<br>')}</p>`)+`<p>${st.exp}</p>`;
+      setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Secuencia perfecta!':'Casi',d,body,null,next),450);
+    };
+  });
+}
+
+/* --- ilustración anatómica: colocar el riñón --- */
+function stBody(st){
+  const ZL={chest:'Tórax',lumbar:'Zona lumbar (posición de los riñones propios)',iliac:'Fosa ilíaca (parte baja del abdomen)'};
+  render(`${hud()}<div><h2 class="q">¿Dónde se coloca habitualmente el riñón trasplantado?</h2><p class="mut" style="margin-top:-8px">Toca una zona del cuerpo.</p>
+  <div class="bodywrap"><svg viewBox="0 0 200 300" id="bsvg" aria-label="Ilustración del torso">
+   <defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16305f"/><stop offset="1" stop-color="#0c1d40"/></linearGradient></defs>
+   <path d="M62 14Q100 2 138 14L166 40Q174 52 170 96L160 150Q154 170 160 200L168 290H32L40 200Q46 170 40 150L30 96Q26 52 34 40Z" fill="url(#sk)" stroke="rgba(96,170,255,.45)" stroke-width="1.5"/>
+   <path d="M100 20V280" stroke="rgba(96,170,255,.15)" stroke-dasharray="3 5"/>
+   <path d="M72 125q-8 2-9 14t9 16q6 0 5-6t1-10q3-6-6-14z" fill="#7a3446" opacity=".8"/>
+   <path d="M128 125q8 2 9 14t-9 16q-6 0-5-6t-1-10q-3-6 6-14z" fill="#7a3446" opacity=".8"/>
+   <path d="M80 141q10 50 16 105M120 141q-10 50-16 105" stroke="#d9b45a" stroke-width="1.5" fill="none" opacity=".6"/>
+   <path d="M100 160v40l-22 30M100 200l22 30" stroke="#ff5d73" stroke-width="2.5" fill="none" opacity=".55"/>
+   <ellipse cx="100" cy="252" rx="17" ry="12" fill="#d9b45a" opacity=".55"/>
+   <text x="100" y="275" text-anchor="middle" fill="#93a8c8" font-size="9" font-family="sans-serif">vejiga</text>
+   <text x="100" y="118" text-anchor="middle" fill="#93a8c8" font-size="9" font-family="sans-serif">riñones propios</text>
+   <g id="nk" class="newk"><path d="M64 214q-10 2-11 15t11 17q7 0 6-7t1-12q3-7-7-13z" fill="#22e4c8" stroke="#eef5ff" stroke-width="1"/><path d="M68 236q8 6 22 14" stroke="#22e4c8" stroke-width="2" fill="none"/></g>
+   <ellipse class="zone" data-z="chest" cx="100" cy="62" rx="54" ry="30"/>
+   <ellipse class="zone" data-z="lumbar" cx="100" cy="140" rx="56" ry="26"/>
+   <ellipse class="zone" data-z="iliac" cx="64" cy="228" rx="22" ry="20"/>
+   <ellipse class="zone" data-z="iliac" cx="136" cy="228" rx="22" ry="20"/>
+  </svg></div><div class="zlabel" id="zl">&nbsp;</div><p class="hint">Vista frontal. El lado derecho del paciente aparece a tu izquierda.</p></div>
+  <div class="actions"><button class="btn" id="go" disabled>Colocar el riñón aquí</button></div>`,()=>{
+    let z=null;const zs=[...document.querySelectorAll('.zone')];
+    zs.forEach(e=>e.addEventListener('click',()=>{z=e.dataset.z;zs.forEach(o=>o.classList.toggle('sel',o.dataset.z===z));$('#zl').textContent=loc(ZL[z]);$('#go').disabled=false;}));
+    $('#go').onclick=()=>{
+      $('#go').disabled=true;const ok=z==='iliac';
+      zs.forEach(o=>{o.style.pointerEvents='none';o.classList.remove('sel');if(o.dataset.z==='iliac')o.classList.add('ok');else if(o.dataset.z===z)o.classList.add('no');});
+      $('#nk').classList.add('on');
+      const d=award(ok);
+      const fb=ok?'':(z==='lumbar'?'<p>Ahí están los riñones propios, que normalmente se dejan en su sitio.</p>':'<p>En el tórax están el corazón y los pulmones.</p>');
+      setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Exacto!':'No es ahí',d,fb+`<p>${st.exp}</p>`,null,next),900);
+    };
+  });
+}
+
+/* --- emparejar conexiones --- */
+function stMatch(st){
+  const L=st.pairs.map((p,i)=>({x:p[0],i})),R=shuffle(st.pairs.map((p,i)=>({x:p[1],i})));
+  let sel=null,errors=0,matched=0;
+  render(`${hud()}<div><h2 class="q">${st.q}</h2>
+  <div class="match"><div class="col l" id="ml">${L.map(o=>`<button data-i="${o.i}">${o.x}</button>`).join('')}</div>
+  <div class="col r" id="mr">${R.map(o=>`<button data-i="${o.i}">${o.x}</button>`).join('')}</div></div>
+  <div class="row" style="justify-content:space-between;margin-top:12px;font-size:13px" class="mut"><span class="mut">RIÑÓN NUEVO</span><span class="mut">RECEPTOR</span></div>
+  <p class="hint" id="mh">Conexiones: 0/3</p></div>`,()=>{
+    const lb=[...$('#ml').children],rb=[...$('#mr').children];
+    lb.forEach(b=>b.onclick=()=>{sel=+b.dataset.i;lb.forEach(x=>x.classList.toggle('sel',x===b));});
+    rb.forEach(b=>b.onclick=()=>{
+      if(sel===null){b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400);return;}
+      if(+b.dataset.i===sel){
+        lb.find(x=>+x.dataset.i===sel).className='done';b.className='done';sel=null;matched++;
+        $('#mh').textContent=loc(`Conexiones: ${matched}/3`);buzz(true);
+        if(matched===3){
+          const ok=errors===0,d=award(ok);
+          setTimeout(()=>sheet(ok?'ok':'no',ok?'¡Riñón conectado!':'Conectado, con errores',d,(ok?'':`<p>Has necesitado ${errors} intento${errors>1?'s':''} de más.</p>`)+`<p>${st.exp}</p>`,null,next),400);
+        }
+      }else{errors++;b.classList.add('shake');buzz(false);setTimeout(()=>b.classList.remove('shake'),400);}
+    });
+  });
+}
+
+/* ============ FIN DE MISIÓN ============ */
+function missionEnd(){
+  const ms=S.ms[S.m],r=ms.c/ms.t;
+  ms.bonus=r===1?100:r>=.7?50:0;
+  S.score+=ms.bonus;ms.pts+=ms.bonus;
+  S.done=Math.max(S.done,S.m+1);
+  const last=S.m===MISSIONS.length-1;
+  const extra=S.m===2?`<div class="note real"><span>${ic('snow')}</span><span><b>Isquemia fría de la partida: ${S.isq} h</b> (cifra del juego). ${S.isq<=8?'Muy buena coordinación.':S.isq<=14?'Aceptable, aunque se podía ganar tiempo.':'Demasiado larga: cada hora cuenta.'}</span></div>`:
+    S.m===4?`<div class="note real"><span>${ic('life')}</span><span><b>Andrés:</b> riñón ${S.pt.k}/100, bienestar ${S.pt.w}/100. ${S.pt.k>=80?'Gracias a tus consejos, su riñón funciona muy bien.':'Algunos consejos han puesto en riesgo su riñón.'}</span></span></div>`:'';
+  render(`<div class="stack" style="padding-top:20px;text-align:center;align-items:center">
+   <div class="eyebrow">Misión ${S.m+1} completada</div>
+   <div class="lcard" style="min-height:0;align-items:center"><div class="ico" style="width:72px;height:72px">${ic(MISSIONS[S.m].icon)}</div></div>
+   <h1 style="font-size:32px">${MISSIONS[S.m].title}</h1>
+   <div class="stars" style="font-size:26px">${stars(ms)}</div></div>
+  <div class="kpis" style="margin-top:18px">
+   <div class="kpi"><small>Aciertos</small><b>${ms.c}/${ms.t}</b></div>
+   <div class="kpi"><small>Puntos misión</small><b>${ms.pts}</b></div>
+   <div class="kpi"><small>Bonus misión</small><b style="color:var(--tq)">+${ms.bonus}</b></div>
+   <div class="kpi"><small>Total</small><b>${S.score}</b></div></div>
+  <div class="stack" style="margin-top:14px">${extra}<p class="mut" style="font-size:14px;text-align:center">${ms.bonus===100?'Misión perfecta: +100 de bonus.':ms.bonus?'Misión superada con nota: +50 de bonus.':'Sin bonus esta vez. Lo importante es lo que has aprendido.'}</p></div>
+  <div class="actions"><button class="btn" id="go">${last?'Reflexión final':'Volver al panel'}</button></div>`,()=>{
+    $('#go').onclick=last?reflection:map;
+  });
+}
+
+function reflection(){
+  render(`<div class="stack" style="padding-top:16px"><div class="eyebrow">Trasplante completado</div>
+   <h1 style="font-size:30px">Todo empezó con una decisión generosa</h1></div>
+   <div class="panel stack" style="margin-top:16px">
+    <p class="big">Detrás de cada riñón trasplantado hay una persona que decidió donar y una familia que respetó su voluntad.</p>
+    <p class="mut">Y decenas de profesionales que trabajaron coordinados contra el reloj.</p>
+   </div>
+   <div class="stack" style="margin-top:14px">
+    <div class="note real"><span>${ic('users')}</span><span><b>Habla con tu familia.</b> Si un día llega el momento, serán quienes transmitan tu decisión. Que la conozcan es lo más importante.</span></div>
+    <div class="note real"><span>${ic('heart')}</span><span><b>Un solo donante fallecido puede ayudar a varias personas.</b> Y un donante vivo puede cambiar la vida de alguien cercano.</span></div>
+   </div>
+   <div class="actions"><button class="btn" id="go">Ver resultados</button></div>`,()=>{$('#go').onclick=results;});
+}
+
+
+/* ============ RÀNQUING EN DIRECTO (Supabase, opcional) ============ */
+const CFG=window.KM_CFG||{};
+const LB_ON=!!(CFG.url&&CFG.key);
+function sbHeaders(extra){const h={apikey:CFG.key,'Content-Type':'application/json'};if(/^eyJ/.test(CFG.key))h.Authorization='Bearer '+CFG.key;return Object.assign(h,extra||{});}
+const BAD=['puta','puto','polla','coño','cono','joder','mierda','cabron','cabrón','gilipollas','imbecil','imbécil','idiota','subnormal','maricon','maricón','marica','zorra','follar','pene','culo','nazi','hitler','fuck','shit','bitch','dick','cunt','merda','collons','fill de puta','retrasado','mongolo','mongol','negrata','sudaca'];
+function cleanAlias(a){
+  a=(a||'').replace(/\s+/g,' ').trim();
+  if(a.length<2||a.length>16)return [null,'El alias debe tener entre 2 y 16 caracteres.'];
+  if(!/^[A-Za-z0-9ÁÉÍÓÚÀÈÒÏÜÑÇáéíóúàèòïüñç _.-]+$/.test(a))return [null,'Usa solo letras, números, espacios, puntos o guiones.'];
+  const n=a.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'').replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s');
+  if(BAD.some(w=>n.includes(w.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,''))))return [null,'Elige otro alias, por favor.'];
+  return [a,null];
+}
+async function lbTop(n){
+  const r=await fetch(`${CFG.url}/rest/v1/scores?select=alias,score,pct,secs,created_at&order=score.desc,secs.asc,created_at.asc&limit=${n}`,{headers:sbHeaders()});
+  if(!r.ok)throw new Error(r.status);return r.json();
+}
+async function lbSubmit(row){
+  const r=await fetch(`${CFG.url}/rest/v1/scores`,{method:'POST',headers:sbHeaders({Prefer:'return=minimal'}),body:JSON.stringify(row)});
+  if(!r.ok)throw new Error(r.status);
+  const q=await fetch(`${CFG.url}/rest/v1/scores?select=id&or=(score.gt.${row.score},and(score.eq.${row.score},secs.lt.${row.secs}))`,{headers:sbHeaders({Prefer:'count=exact',Range:'0-0'})});
+  const cr=q.headers.get('content-range')||'';const tot=+cr.split('/')[1];
+  return isNaN(tot)?null:tot+1;
+}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function lbRows(list,me){return list.map((x,i)=>`<div class="lbrow ${me&&x.alias===me.alias&&x.score===me.score?'me':''}"><span class="p">${i+1}</span><span>${esc(x.alias)}</span><b>${x.score}</b></div>`).join('');}
+function lbPanel(){
+  if(!LB_ON)return '';
+  return `<div class="panel lb" style="margin-top:12px" id="lb"><div class="row">${ic('trophy').replace('<svg','<svg width="26" height="26" style="color:var(--warn);flex:none"')}<h3 style="font-size:19px">Ranking en directo</h3></div>
+   ${S.sent?'':`<p class="lbmsg">Escribe un alias para aparecer en el ranking del stand. No uses tu nombre completo ni datos personales.</p>
+   <form class="lbform" id="lbf"><input id="alias" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tu alias" aria-label="Alias"><button class="btn" id="lbsend" type="submit">Enviar</button></form>`}
+   <p class="lbmsg" id="lbm"></p><div id="lbl"></div><a class="lbmsg" href="ranking.html" style="color:var(--tq)">Ver el ranking completo ›</a></div>`;
+}
+function lbBind(pct,sec){
+  if(!LB_ON)return;
+  const show=me=>lbTop(5).then(l=>{$('#lbl').innerHTML=l.length?lbRows(l,me):loc('<p class="lbmsg">Aún no hay puntuaciones. ¡Sé la primera persona!</p>');}).catch(()=>{});
+  show(S.sent);
+  const f=$('#lbf');if(!f)return;
+  f.onsubmit=async e=>{
+    e.preventDefault();const m=$('#lbm');
+    const [a,err]=cleanAlias($('#alias').value);
+    if(err){m.textContent=loc(err);m.className='lbmsg err';return;}
+    $('#lbsend').disabled=true;m.className='lbmsg';m.textContent=loc('Enviando…');
+    try{
+      const row={alias:a,score:S.score,pct,secs:Math.max(60,Math.min(7200,sec))};
+      const pos=await lbSubmit(row);S.sent=row;
+      f.remove();document.querySelector('#lb .lbmsg').remove();
+      m.innerHTML=loc(pos?`¡Hecho, <b style="color:var(--tq)">${esc(a)}</b>! Estás en la posición <b style="color:var(--tq)">${pos}</b>.`:'¡Puntuación enviada!');
+      show(row);
+    }catch(x){$('#lbsend').disabled=false;m.className='lbmsg err';m.textContent=loc('No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.');}
+  };
+}
+
+/* ============ RESULTADOS ============ */
+function results(){
+  if(!S.final){S.final=true;S.t1=Date.now();S.score+=150;}
+  const pct=S.total?Math.round(S.correct/S.total*100):0;
+  const sec=Math.round((S.t1-S.t0)/1000),tm=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+  const R=pct>=90?['Coordinación de élite','Has tomado decisiones con criterio de profesional. Ya sabes explicar cómo funciona un trasplante renal: compártelo.']:
+    pct>=70?['Coordinación experta','Dominas lo esencial del proceso. Repasa los detalles que se te escaparon y estarás al nivel de los mejores.']:
+    pct>=50?['Coordinación en formación','Vas por buen camino. Cada error de hoy es algo que ya no olvidarás. ¿Lo intentas otra vez?']:
+    ['Primer turno de guardia','Nadie nace sabiendo: has descubierto un mundo complejo. Vuelve a jugar y verás cuánto has aprendido.'];
+  const C=2*Math.PI*72;
+  const rows=MISSIONS.map((M,i)=>`<div class="mrow"><span>${i+1}. ${M.title}</span><span><span class="stars">${stars(S.ms[i])}</span> <span class="mut">${S.ms[i].c}/${S.ms[i].t}</span></span></div>`).join('');
+  render(`<div class="stack" style="padding-top:10px;text-align:center"><div class="eyebrow">Informe final de la misión</div></div>
+  <div class="panel stack" style="margin-top:12px;gap:16px">
+   <div class="ring"><svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="72" fill="none" stroke="rgba(96,170,255,.15)" stroke-width="12"/>
+    <circle id="arc" cx="85" cy="85" r="72" fill="none" stroke="url(#rg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" style="transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)"/>
+    <defs><linearGradient id="rg"><stop offset="0" stop-color="#22e4c8"/><stop offset="1" stop-color="#2f7bff"/></linearGradient></defs></svg>
+    <div class="v"><b id="tot">0</b><small>puntos</small></div></div>
+   <div class="rank"><h2>${R[0]}</h2><p class="mut" style="margin-top:6px">${R[1]}</p></div>
+  </div>
+  <div class="kpis" style="margin-top:12px">
+   <div class="kpi"><small>Aciertos</small><b>${pct}%</b></div>
+   <div class="kpi"><small>Misiones</small><b>${S.done}/5</b></div>
+   <div class="kpi"><small>Tiempo</small><b>${tm}</b></div>
+   <div class="kpi"><small>Decisiones</small><b>${S.correct}/${S.total}</b></div></div>
+  <div class="panel" style="margin-top:12px;padding:8px 16px">${rows}<div class="mrow"><span>Bonus por completar el juego</span><b style="color:var(--tq)">+150</b></div></div>
+  ${lbPanel()}
+  <div class="panel stack" style="margin-top:12px;border-color:rgba(34,228,200,.45)">
+   <div class="row">${ic('heart').replace('<svg','<svg width="28" height="28" style="color:var(--tq);flex:none"')}<h3 style="font-size:19px">La donación salva vidas</h3></div>
+   <p>Miles de personas esperan un riñón. Decidir ser donante y contárselo a tu familia es un gesto sencillo que puede devolver a alguien una vida sin diálisis.</p>
+   <p class="mut" style="font-size:14px">Más información en la web de la Organización Nacional de Trasplantes: <a href="https://www.ont.es" target="_blank" rel="noopener">ont.es</a></p>
+  </div>
+  <p class="src" style="margin-top:12px">Contenido divulgativo basado en información de la ONT y de sociedades científicas de nefrología y trasplante. Los casos son ficticios y simplificados, y no sustituyen la valoración de profesionales sanitarios. Las cifras marcadas como orientativas varían según cada caso.</p>
+  <div class="actions"><button class="btn" id="go">Volver a jugar</button></div>`,()=>{
+    requestAnimationFrame(()=>setTimeout(()=>{$('#arc').style.strokeDashoffset=C*(1-pct/100);},60));
+    const el=$('#tot'),T=S.score,t0=performance.now();
+    const tick=t=>{const k=Math.min(1,(t-t0)/1200);el.textContent=Math.round(T*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick);};
+    requestAnimationFrame(tick);
+    $('#go').onclick=splash;
+    lbBind(pct,sec);
+  });
+}
+
+splash();
+</script>
+</body>
+</html>

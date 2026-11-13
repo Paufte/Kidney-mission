@@ -1,11 +1,11 @@
 # KIDNEY MISSION
 
-Una decisión puede salvar una vida.
+Una decisió pot salvar una vida · Una decisión puede salvar una vida.
 
-Videojuego educativo y divulgativo sobre la donación y el trasplante renal, pensado para móviles. Casos y personajes ficticios; el contenido no sustituye el consejo de profesionales sanitarios.
+Videojuego educativo y divulgativo sobre la donación y el trasplante renal, pensado para móviles, en catalán y castellano. Casos y personajes ficticios; el contenido no sustituye el consejo de profesionales sanitarios.
 
-Jugar: https://paufte.github.io/Kidney-mission/
-
-Ranking en directo (pantalla del stand): https://paufte.github.io/Kidney-mission/ranking.html
-
-El ranking usa Supabase. La URL y la clave pública se configuran en `config.js`.
+- Inicio (QR maestro): https://paufte.github.io/Kidney-mission/
+- Juego: `joc.html` (`#ca` o `#es` para fijar idioma)
+- Ranking en directo (pantalla del stand): `ranking.html`
+- Configuración de Supabase: `config.js`
+- Tarjeta y PDF: carpeta `media/`
