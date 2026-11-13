@@ -279,6 +279,19 @@ p{margin:0}
 .big{font-size:20px;line-height:1.4;font-family:var(--f-disp);font-weight:600}
 a{color:var(--tq)}
 .src{font-size:12.5px;color:var(--mut)}
+.lb{display:flex;flex-direction:column;gap:10px}
+.lbform{display:flex;gap:8px}
+.lbform input{flex:1;min-width:0;height:52px;border-radius:12px;border:1px solid var(--line);background:rgba(4,10,28,.8);color:var(--txt);font:inherit;font-size:17px;padding:0 14px}
+.lbform input:focus{outline:2px solid var(--tq);outline-offset:1px}
+.lbform .btn{width:auto;min-height:52px;padding:0 18px;font-size:15px}
+.lbrow{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.lbrow:last-child{border:0}
+.lbrow .p{font-family:var(--f-disp);font-weight:700;color:var(--mut)}
+.lbrow b{font-family:var(--f-disp);font-variant-numeric:tabular-nums}
+.lbrow.me{color:var(--tq)}
+.lbrow.me .p{color:var(--tq)}
+.lbmsg{font-size:14px;color:var(--mut)}
+.lbmsg.err{color:var(--bad)}
 </style>
 </head>
 <body>
@@ -287,6 +300,7 @@ a{color:var(--tq)}
 <div id="sheet" role="dialog" aria-modal="true"><div class="box panel" id="sheetbox"></div></div>
 <div id="gloss" role="dialog" aria-modal="true"><div class="box panel" id="glossbox"></div></div>
 
+<script src="config.js"></script>
 <script>
 /* ============ ICONOS ============ */
 const P = {
@@ -494,7 +508,7 @@ const MISSIONS=[
 
 /* ============ ESTADO ============ */
 const S={};
-function reset(){Object.assign(S,{score:0,correct:0,total:0,m:0,li:0,si:0,sub:0,done:0,t0:Date.now(),t1:0,ms:MISSIONS.map(()=>({c:0,t:0,pts:0,bonus:0})),isq:2,pt:{k:70,w:60},final:false});}
+function reset(){Object.assign(S,{score:0,correct:0,total:0,m:0,li:0,si:0,sub:0,done:0,t0:Date.now(),t1:0,ms:MISSIONS.map(()=>({c:0,t:0,pts:0,bonus:0})),isq:2,pt:{k:70,w:60},final:false,sent:null});}
 reset();
 window.KM={S,MISSIONS};
 
@@ -886,6 +900,60 @@ function reflection(){
    <div class="actions"><button class="btn" id="go">Ver resultados</button></div>`,()=>{$('#go').onclick=results;});
 }
 
+
+/* ============ RÀNQUING EN DIRECTO (Supabase, opcional) ============ */
+const CFG=window.KM_CFG||{};
+const LB_ON=!!(CFG.url&&CFG.key);
+function sbHeaders(extra){const h={apikey:CFG.key,'Content-Type':'application/json'};if(/^eyJ/.test(CFG.key))h.Authorization='Bearer '+CFG.key;return Object.assign(h,extra||{});}
+const BAD=['puta','puto','polla','coño','cono','joder','mierda','cabron','cabrón','gilipollas','imbecil','imbécil','idiota','subnormal','maricon','maricón','marica','zorra','follar','pene','culo','nazi','hitler','fuck','shit','bitch','dick','cunt','merda','collons','fill de puta','retrasado','mongolo','mongol','negrata','sudaca'];
+function cleanAlias(a){
+  a=(a||'').replace(/\s+/g,' ').trim();
+  if(a.length<2||a.length>16)return [null,'El alias debe tener entre 2 y 16 caracteres.'];
+  if(!/^[A-Za-z0-9ÁÉÍÓÚÀÈÒÏÜÑÇáéíóúàèòïüñç _.-]+$/.test(a))return [null,'Usa solo letras, números, espacios, puntos o guiones.'];
+  const n=a.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'').replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s');
+  if(BAD.some(w=>n.includes(w.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,''))))return [null,'Elige otro alias, por favor.'];
+  return [a,null];
+}
+async function lbTop(n){
+  const r=await fetch(`${CFG.url}/rest/v1/scores?select=alias,score,pct,secs,created_at&order=score.desc,secs.asc,created_at.asc&limit=${n}`,{headers:sbHeaders()});
+  if(!r.ok)throw new Error(r.status);return r.json();
+}
+async function lbSubmit(row){
+  const r=await fetch(`${CFG.url}/rest/v1/scores`,{method:'POST',headers:sbHeaders({Prefer:'return=minimal'}),body:JSON.stringify(row)});
+  if(!r.ok)throw new Error(r.status);
+  const q=await fetch(`${CFG.url}/rest/v1/scores?select=id&or=(score.gt.${row.score},and(score.eq.${row.score},secs.lt.${row.secs}))`,{headers:sbHeaders({Prefer:'count=exact',Range:'0-0'})});
+  const cr=q.headers.get('content-range')||'';const tot=+cr.split('/')[1];
+  return isNaN(tot)?null:tot+1;
+}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function lbRows(list,me){return list.map((x,i)=>`<div class="lbrow ${me&&x.alias===me.alias&&x.score===me.score?'me':''}"><span class="p">${i+1}</span><span>${esc(x.alias)}</span><b>${x.score}</b></div>`).join('');}
+function lbPanel(){
+  if(!LB_ON)return '';
+  return `<div class="panel lb" style="margin-top:12px" id="lb"><div class="row">${ic('trophy').replace('<svg','<svg width="26" height="26" style="color:var(--warn);flex:none"')}<h3 style="font-size:19px">Ranking en directo</h3></div>
+   ${S.sent?'':`<p class="lbmsg">Escribe un alias para aparecer en el ranking del stand. No uses tu nombre completo ni datos personales.</p>
+   <form class="lbform" id="lbf"><input id="alias" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tu alias" aria-label="Alias"><button class="btn" id="lbsend" type="submit">Enviar</button></form>`}
+   <p class="lbmsg" id="lbm"></p><div id="lbl"></div></div>`;
+}
+function lbBind(pct,sec){
+  if(!LB_ON)return;
+  const show=me=>lbTop(5).then(l=>{$('#lbl').innerHTML=l.length?lbRows(l,me):'<p class="lbmsg">Aún no hay puntuaciones. ¡Sé la primera persona!</p>';}).catch(()=>{});
+  show(S.sent);
+  const f=$('#lbf');if(!f)return;
+  f.onsubmit=async e=>{
+    e.preventDefault();const m=$('#lbm');
+    const [a,err]=cleanAlias($('#alias').value);
+    if(err){m.textContent=err;m.className='lbmsg err';return;}
+    $('#lbsend').disabled=true;m.className='lbmsg';m.textContent='Enviando…';
+    try{
+      const row={alias:a,score:S.score,pct,secs:Math.max(60,Math.min(7200,sec))};
+      const pos=await lbSubmit(row);S.sent=row;
+      f.remove();document.querySelector('#lb .lbmsg').remove();
+      m.innerHTML=pos?`¡Hecho, <b style="color:var(--tq)">${esc(a)}</b>! Estás en la posición <b style="color:var(--tq)">${pos}</b>.`:'¡Puntuación enviada!';
+      show(row);
+    }catch(x){$('#lbsend').disabled=false;m.className='lbmsg err';m.textContent='No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.';}
+  };
+}
+
 /* ============ RESULTADOS ============ */
 function results(){
   if(!S.final){S.final=true;S.t1=Date.now();S.score+=150;}
@@ -911,6 +979,7 @@ function results(){
    <div class="kpi"><small>Tiempo</small><b>${tm}</b></div>
    <div class="kpi"><small>Decisiones</small><b>${S.correct}/${S.total}</b></div></div>
   <div class="panel" style="margin-top:12px;padding:8px 16px">${rows}<div class="mrow"><span>Bonus por completar el juego</span><b style="color:var(--tq)">+150</b></div></div>
+  ${lbPanel()}
   <div class="panel stack" style="margin-top:12px;border-color:rgba(34,228,200,.45)">
    <div class="row">${ic('heart').replace('<svg','<svg width="28" height="28" style="color:var(--tq);flex:none"')}<h3 style="font-size:19px">La donación salva vidas</h3></div>
    <p>Miles de personas esperan un riñón. Decidir ser donante y contárselo a tu familia es un gesto sencillo que puede devolver a alguien una vida sin diálisis.</p>
@@ -923,6 +992,7 @@ function results(){
     const tick=t=>{const k=Math.min(1,(t-t0)/1200);el.textContent=Math.round(T*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick);};
     requestAnimationFrame(tick);
     $('#go').onclick=splash;
+    lbBind(pct,sec);
   });
 }
 
