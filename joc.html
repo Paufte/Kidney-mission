@@ -295,6 +295,14 @@ a{color:var(--tq)}
 .lbrow.me .p{color:var(--tq)}
 .lbmsg{font-size:14px;color:var(--mut)}
 .lbmsg.err{color:var(--bad)}
+.reg{gap:12px}
+.reg label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--mut)}
+.reg input:not([type=checkbox]){height:52px;border-radius:12px;border:1px solid var(--line);background:rgba(4,10,28,.8);color:var(--txt);font:inherit;font-size:17px;padding:0 14px;width:100%}
+.reg input:focus{outline:2px solid var(--tq);outline-offset:1px}
+.reg input.bad{border-color:var(--bad)}
+.reg .chk{flex-direction:row;align-items:flex-start;gap:10px;font-size:14px;color:var(--txt);line-height:1.4}
+.reg .chk input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--tq)}
+.linkbtn{border:0;background:none;color:var(--tq);font:inherit;font-size:13px;text-decoration:underline;padding:4px 0;cursor:pointer}
 </style>
 </head>
 <body>
@@ -690,7 +698,7 @@ const UI_CA=[
  // inici i introducció
  ['Unidad de coordinación de trasplantes','Unitat de coordinació de trasplantaments'],
  ['Una decisión puede salvar una vida.','Una decisió pot salvar una vida.'],
- ['>5 misiones<','>5 missions<'],['>5-7 minutos<','>5-7 minuts<'],['>Sin registro<','>Sense registre<'],
+ ['>5 misiones<','>5 missions<'],['>5-7 minutos<','>5-7 minuts<'],['>Concurso<','>Concurs<'],
  ['Juego divulgativo. Casos y personajes ficticios.','Joc divulgatiu. Casos i personatges ficticis.'],
  ['LLAMADA DE GUARDIA','TRUCADA DE GUÀRDIA'],
  ['Eres responsable de la <b>coordinación de trasplantes</b> de un hospital.','Ets responsable de la <b>coordinació de trasplantaments</b> d\'un hospital.'],
@@ -761,6 +769,18 @@ const UI_CA=[
  ['placeholder="Tu alias"','placeholder="El teu àlies"'],['>Enviar<','>Enviar<'],['Aún no hay puntuaciones. ¡Sé la primera persona!','Encara no hi ha puntuacions. Sigues la primera persona!'],
  ['El alias debe tener entre 2 y 16 caracteres.','L\'àlies ha de tenir entre 2 i 16 caràcters.'],['Usa solo letras, números, espacios, puntos o guiones.','Fes servir només lletres, números, espais, punts o guionets.'],['Elige otro alias, por favor.','Tria un altre àlies, si us plau.'],
  ['Enviando…','Enviant…'],['¡Hecho, ','Fet, '],['! Estás en la posición ','! Ets a la posició '],['¡Puntuación enviada!','Puntuació enviada!'],['No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.','No s\'ha pogut enviar. Revisa la connexió i torna-ho a provar.'],
+ // registre
+ ['Registro del concurso','Registre del concurs'],['Antes de empezar','Abans de començar'],
+ ['Para participar en el concurso necesitamos tus datos. Si ganas, te escribiremos al correo.','Per participar en el concurs necessitem les teves dades. Si guanyes, t\'escriurem al correu.'],
+ ['<span>Nombre</span>','<span>Nom</span>'],['<span>Primer apellido</span>','<span>Primer cognom</span>'],['<span>Segundo apellido</span>','<span>Segon cognom</span>'],['<span>Correo electrónico</span>','<span>Correu electrònic</span>'],
+ ['Acepto que se guarden mis datos para gestionar el concurso, como se explica abajo.','Accepto que es desin les meves dades per gestionar el concurs, tal com s\'explica a sota.'],
+ [' Empezar la misión<',' Començar la missió<'],['>No soy yo: borrar mis datos de este móvil<','>No sóc jo: esborrar les meves dades d\'aquest mòbil<'],['>Jugar sin participar en el concurso<','>Jugar sense participar en el concurs<'],
+ ['<b>Privacidad.</b> Guardamos tu nombre, apellidos, correo, la hora de la partida y la puntuación solo para organizar el concurso y avisar a quien gane. Solo los ve la organización del stand, no se comparten con nadie y se borrarán al terminar el concurso. En el ranking público solo aparecen tu nombre y la inicial del primer apellido. Puedes pedir que los borremos en el stand.','<b>Privacitat.</b> Desem el teu nom, cognoms, correu, l\'hora de la partida i la puntuació només per organitzar el concurs i avisar qui guanyi. Només els veu l\'organització de l\'estand, no es comparteixen amb ningú i s\'esborraran en acabar el concurs. Al rànquing públic només hi surten el teu nom i la inicial del primer cognom. Pots demanar que les esborrem a l\'estand.'],
+ ['Escribe tu nombre.','Escriu el teu nom.'],['Escribe tus dos apellidos.','Escriu els teus dos cognoms.'],['Revisa el correo electrónico.','Revisa el correu electrònic.'],['Para participar tienes que aceptar la nota de privacidad.','Per participar has d\'acceptar la nota de privacitat.'],
+ ['Registrando…','Registrant…'],['‹ Volver','‹ Tornar'],['No se ha podido registrar. Revisa la conexión e inténtalo de nuevo.','No s\'ha pogut registrar. Revisa la connexió i torna-ho a provar.'],
+ ['Guardando tu puntuación…','Desant la teva puntuació…'],['No se ha podido guardar la puntuación. Revisa la conexión y vuelve a intentarlo.','No s\'ha pogut desar la puntuació. Revisa la connexió i torna-ho a provar.'],['>Reintentar<','>Tornar-ho a provar<'],
+ ['Has jugado sin registrarte: esta partida no participa en el concurso.','Has jugat sense registrar-te: aquesta partida no participa en el concurs.'],
+ ['Puntuación guardada. Si ganas, te escribiremos a ','Puntuació desada. Si guanyes, t\'escriurem a '],
  // glossari
  ['>Glosario<','>Glossari<'],['>Inicio</a>','>Inici</a>'],['>Ranking</a>','>Rànquing</a>'],['Ver el ranking completo ›','Veure el rànquing complet ›'],['>Entendido<','>Entesos<']
 ].sort((a,b)=>b[0].length-a[0].length);
@@ -774,7 +794,7 @@ applyLang();
 
 /* ============ ESTADO ============ */
 const S={};
-function reset(){Object.assign(S,{score:0,correct:0,total:0,m:0,li:0,si:0,sub:0,done:0,t0:Date.now(),t1:0,ms:MISSIONS.map(()=>({c:0,t:0,pts:0,bonus:0})),isq:2,pt:{k:70,w:60},final:false,sent:null});}
+function reset(){Object.assign(S,{score:0,correct:0,total:0,m:0,li:0,si:0,sub:0,done:0,t0:Date.now(),t1:0,ms:MISSIONS.map(()=>({c:0,t:0,pts:0,bonus:0})),isq:2,pt:{k:70,w:60},final:false,sent:null,rid:null,regFails:0});}
 reset();
 window.KM={S,MISSIONS};
 
@@ -848,12 +868,12 @@ function splash(){
    <div class="logo"><div class="ring"></div>${LOGO}</div>
    <h1 class="title">KIDNEY<span>MISSION</span></h1>
    <p class="sub">Una decisión puede salvar una vida.</p>
-   <div class="chips"><span class="chip">5 misiones</span><span class="chip">5-7 minutos</span><span class="chip">Sin registro</span></div>
+   <div class="chips"><span class="chip">5 misiones</span><span class="chip">5-7 minutos</span><span class="chip">Concurso</span></div>
    <div class="lang" role="group" aria-label="Idioma / Language"><button data-l="es" class="${LANG==='es'?'on':''}">Castellano</button><button data-l="ca" class="${LANG==='ca'?'on':''}">Català</button></div>
   </div>
   <div class="actions"><button class="btn" id="go">${ic('life',2.2)} Start mission</button>
   <p class="src" style="text-align:center">Juego divulgativo. Casos y personajes ficticios. · <a href="./">Inicio</a> · <a href="ranking.html">Ranking</a></p></div>`,()=>{
-    $('#go').onclick=()=>{S.t0=Date.now();intro();};
+    $('#go').onclick=()=>{if(LB_ON)register();else{S.t0=Date.now();intro();}};
     document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('km_lang',LANG);}catch(e){}applyLang();splash();});
   });
 }
@@ -1173,53 +1193,90 @@ function reflection(){
 const CFG=window.KM_CFG||{};
 const LB_ON=!!(CFG.url&&CFG.key);
 function sbHeaders(extra){const h={apikey:CFG.key,'Content-Type':'application/json'};if(/^eyJ/.test(CFG.key))h.Authorization='Bearer '+CFG.key;return Object.assign(h,extra||{});}
-const BAD=['puta','puto','polla','coño','cono','joder','mierda','cabron','cabrón','gilipollas','imbecil','imbécil','idiota','subnormal','maricon','maricón','marica','zorra','follar','pene','culo','nazi','hitler','fuck','shit','bitch','dick','cunt','merda','collons','fill de puta','retrasado','mongolo','mongol','negrata','sudaca'];
-function cleanAlias(a){
-  a=(a||'').replace(/\s+/g,' ').trim();
-  if(a.length<2||a.length>16)return [null,'El alias debe tener entre 2 y 16 caracteres.'];
-  if(!/^[A-Za-z0-9ÁÉÍÓÚÀÈÒÏÜÑÇáéíóúàèòïüñç _.-]+$/.test(a))return [null,'Usa solo letras, números, espacios, puntos o guiones.'];
-  const n=a.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'').replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s');
-  if(BAD.some(w=>n.includes(w.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,''))))return [null,'Elige otro alias, por favor.'];
-  return [a,null];
+async function rpc(fn,args){
+  const r=await fetch(`${CFG.url}/rest/v1/rpc/${fn}`,{method:'POST',headers:sbHeaders(),body:JSON.stringify(args)});
+  if(!r.ok)throw new Error(r.status);return r.json();
 }
 async function lbTop(n){
   const r=await fetch(`${CFG.url}/rest/v1/scores?select=alias,score,pct,secs,created_at&order=score.desc,secs.asc,created_at.asc&limit=${n}`,{headers:sbHeaders()});
   if(!r.ok)throw new Error(r.status);return r.json();
 }
-async function lbSubmit(row){
-  const r=await fetch(`${CFG.url}/rest/v1/scores`,{method:'POST',headers:sbHeaders({Prefer:'return=minimal'}),body:JSON.stringify(row)});
-  if(!r.ok)throw new Error(r.status);
-  const q=await fetch(`${CFG.url}/rest/v1/scores?select=id&or=(score.gt.${row.score},and(score.eq.${row.score},secs.lt.${row.secs}))`,{headers:sbHeaders({Prefer:'count=exact',Range:'0-0'})});
-  const cr=q.headers.get('content-range')||'';const tot=+cr.split('/')[1];
-  return isNaN(tot)?null:tot+1;
-}
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---- registro antes de jugar ---- */
+const tidy=v=>(v||'').replace(/\s+/g,' ').trim();
+function register(){
+  let P={};try{P=JSON.parse(localStorage.getItem('km_player')||'{}')||{};}catch(e){}
+  const v=k=>esc(P[k]||'');
+  render(`<div class="stack" style="padding-top:10px"><div class="eyebrow">Registro del concurso</div>
+   <h2 style="font-size:26px">Antes de empezar</h2>
+   <p class="mut">Para participar en el concurso necesitamos tus datos. Si ganas, te escribiremos al correo.</p></div>
+  <form class="panel stack reg" id="regf" novalidate style="margin-top:14px">
+   <label><span>Nombre</span><input id="rn" value="${v('n')}" maxlength="60" autocomplete="given-name" autocapitalize="words"></label>
+   <label><span>Primer apellido</span><input id="ra1" value="${v('a1')}" maxlength="60" autocomplete="family-name" autocapitalize="words"></label>
+   <label><span>Segundo apellido</span><input id="ra2" value="${v('a2')}" maxlength="60" autocomplete="off" autocapitalize="words"></label>
+   <label><span>Correo electrónico</span><input id="rem" type="email" value="${v('e')}" maxlength="120" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"></label>
+   <label class="chk"><input type="checkbox" id="rok" ${P.e?'checked':''}><span>Acepto que se guarden mis datos para gestionar el concurso, como se explica abajo.</span></label>
+   <p class="lbmsg" id="rmsg" role="alert"></p>
+   <button class="btn" type="submit" id="rgo">${ic('life',2.2)} Empezar la misión</button>
+   ${P.e?'<button class="linkbtn" type="button" id="rclr">No soy yo: borrar mis datos de este móvil</button>':''}
+   <button class="btn ghost" type="button" id="roff" style="display:${S.regFails>=2?'flex':'none'}">Jugar sin participar en el concurso</button>
+  </form>
+  <div class="note" style="margin-top:12px"><span>${ic('info')}</span><span><b>Privacidad.</b> Guardamos tu nombre, apellidos, correo, la hora de la partida y la puntuación solo para organizar el concurso y avisar a quien gane. Solo los ve la organización del stand, no se comparten con nadie y se borrarán al terminar el concurso. En el ranking público solo aparecen tu nombre y la inicial del primer apellido. Puedes pedir que los borremos en el stand.</span></div>
+  <p class="src" style="text-align:center;margin-top:10px"><a href="#" id="rback">‹ Volver</a></p>`,()=>{
+    const m=$('#rmsg');
+    $('#rback').onclick=e=>{e.preventDefault();splash();};
+    if($('#rclr'))$('#rclr').onclick=()=>{try{localStorage.removeItem('km_player');}catch(e){}register();};
+    $('#roff').onclick=()=>{S.rid=null;S.t0=Date.now();intro();};
+    $('#regf').onsubmit=async e=>{
+      e.preventDefault();
+      document.querySelectorAll('.reg input').forEach(i=>i.classList.remove('bad'));
+      const d={n:tidy($('#rn').value),a1:tidy($('#ra1').value),a2:tidy($('#ra2').value),e:tidy($('#rem').value).toLowerCase()};
+      const fail=(id,t)=>{if(id)$(id).classList.add('bad');m.className='lbmsg err';m.textContent=loc(t);if(id)$(id).focus();};
+      if(!d.n)return fail('#rn','Escribe tu nombre.');
+      if(!d.a1)return fail('#ra1','Escribe tus dos apellidos.');
+      if(!d.a2)return fail('#ra2','Escribe tus dos apellidos.');
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(d.e))return fail('#rem','Revisa el correo electrónico.');
+      if(!$('#rok').checked)return fail(null,'Para participar tienes que aceptar la nota de privacidad.');
+      $('#rgo').disabled=true;m.className='lbmsg';m.textContent=loc('Registrando…');
+      try{
+        const id=await rpc('km_registrar',{p_nombre:d.n,p_apellido1:d.a1,p_apellido2:d.a2,p_email:d.e,p_idioma:LANG,p_consentimiento:true});
+        if(typeof id!=='string')throw new Error('id');
+        try{localStorage.setItem('km_player',JSON.stringify(d));}catch(x){}
+        S.rid=id;S.email=d.e;S.t0=Date.now();intro();
+      }catch(x){
+        S.regFails++;$('#rgo').disabled=false;fail(null,'No se ha podido registrar. Revisa la conexión e inténtalo de nuevo.');
+        if(S.regFails>=2)$('#roff').style.display='flex';
+      }
+    };
+  });
+}
+
+/* ---- ranking al final ---- */
 function lbRows(list,me){return list.map((x,i)=>`<div class="lbrow ${me&&x.alias===me.alias&&x.score===me.score?'me':''}"><span class="p">${i+1}</span><span>${esc(x.alias)}</span><b>${x.score}</b></div>`).join('');}
 function lbPanel(){
   if(!LB_ON)return '';
   return `<div class="panel lb" style="margin-top:12px" id="lb"><div class="row">${ic('trophy').replace('<svg','<svg width="26" height="26" style="color:var(--warn);flex:none"')}<h3 style="font-size:19px">Ranking en directo</h3></div>
-   ${S.sent?'':`<p class="lbmsg">Escribe un alias para aparecer en el ranking del stand. No uses tu nombre completo ni datos personales.</p>
-   <form class="lbform" id="lbf"><input id="alias" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tu alias" aria-label="Alias"><button class="btn" id="lbsend" type="submit">Enviar</button></form>`}
-   <p class="lbmsg" id="lbm"></p><div id="lbl"></div><a class="lbmsg" href="ranking.html" style="color:var(--tq)">Ver el ranking completo ›</a></div>`;
+   <p class="lbmsg" id="lbm"></p><div id="lbx"></div><div id="lbl"></div><a class="lbmsg" href="ranking.html" style="color:var(--tq)">Ver el ranking completo ›</a></div>`;
 }
 function lbBind(pct,sec){
   if(!LB_ON)return;
+  const m=$('#lbm');
   const show=me=>lbTop(5).then(l=>{$('#lbl').innerHTML=l.length?lbRows(l,me):loc('<p class="lbmsg">Aún no hay puntuaciones. ¡Sé la primera persona!</p>');}).catch(()=>{});
-  show(S.sent);
-  const f=$('#lbf');if(!f)return;
-  f.onsubmit=async e=>{
-    e.preventDefault();const m=$('#lbm');
-    const [a,err]=cleanAlias($('#alias').value);
-    if(err){m.textContent=loc(err);m.className='lbmsg err';return;}
-    $('#lbsend').disabled=true;m.className='lbmsg';m.textContent=loc('Enviando…');
+  const done=()=>{m.className='lbmsg';m.innerHTML=loc(S.sent.pos?`¡Hecho, <b style="color:var(--tq)">${esc(S.sent.alias)}</b>! Estás en la posición <b style="color:var(--tq)">${S.sent.pos}</b>.`:'¡Puntuación enviada!')+'<br>'+loc('Puntuación guardada. Si ganas, te escribiremos a ')+`<b>${esc(S.email||'')}</b>.`;};
+  if(S.sent){done();show(S.sent);return;}
+  if(!S.rid){m.textContent=loc('Has jugado sin registrarte: esta partida no participa en el concurso.');show();return;}
+  const send=async()=>{
+    $('#lbx').innerHTML='';m.className='lbmsg';m.textContent=loc('Guardando tu puntuación…');
     try{
-      const row={alias:a,score:S.score,pct,secs:Math.max(60,Math.min(7200,sec))};
-      const pos=await lbSubmit(row);S.sent=row;
-      f.remove();document.querySelector('#lb .lbmsg').remove();
-      m.innerHTML=loc(pos?`¡Hecho, <b style="color:var(--tq)">${esc(a)}</b>! Estás en la posición <b style="color:var(--tq)">${pos}</b>.`:'¡Puntuación enviada!');
-      show(row);
-    }catch(x){$('#lbsend').disabled=false;m.className='lbmsg err';m.textContent=loc('No se ha podido enviar. Revisa la conexión e inténtalo de nuevo.');}
+      const r=await rpc('km_finalizar',{p_id:S.rid,p_puntuacion:S.score,p_pct:pct,p_segundos:sec});
+      S.sent={alias:r.alias,score:S.score,pos:r.posicion};done();show(S.sent);
+    }catch(x){
+      m.className='lbmsg err';m.textContent=loc('No se ha podido guardar la puntuación. Revisa la conexión y vuelve a intentarlo.');
+      $('#lbx').innerHTML=loc('<button class="btn ghost" id="lbretry" type="button">Reintentar</button>');$('#lbretry').onclick=send;show();
+    }
   };
+  send();
 }
 
 /* ============ RESULTADOS ============ */
