@@ -8,4 +8,5 @@ Videojuego educativo y divulgativo sobre la donación y el trasplante renal, pen
 - Juego: `joc.html` (`#ca` o `#es` para fijar idioma)
 - Ranking en directo (pantalla del stand): `ranking.html`
 - Configuración de Supabase: `config.js`
+- Web informativa sobre trasplantes (CA/ES/EN): `info/` → https://paufte.github.io/Kidney-mission/info/ (QR: `media/qr-info.png`, cartel: `media/cartel-qr-info.png`)
 - Tarjeta y PDF: carpeta `media/`
